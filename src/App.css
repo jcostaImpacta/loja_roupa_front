@@ -2,7 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Helvetica;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight: 100;
   text-shadow: #000 1px 1px;
   color: #fff;
 }
@@ -12,9 +13,11 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #4f7799;
+  max-width: 100%;
+  background: linear-gradient(#2EAAE9, #0C2051);
   background-size: cover;
   background-position: center;
   width: 405%;
+  color: #fff;
 } 
 
