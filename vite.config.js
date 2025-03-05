@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/login": "http://127.0.0.1:8000",
+      "/create_usuario/": "http://127.0.0.1:8000" // Adicionado aqui
     },
   },
 })

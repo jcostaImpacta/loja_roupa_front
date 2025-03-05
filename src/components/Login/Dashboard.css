@@ -1,0 +1,21 @@
+.dashboard-container {
+    text-align: center;
+    margin-top: 50px;
+    color: white;
+  }
+  
+  .dashboard-container button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #001469;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .dashboard-container button:hover {
+    background-color: #0036a3;
+  }
+  

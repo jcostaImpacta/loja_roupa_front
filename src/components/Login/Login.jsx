@@ -1,52 +1,115 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Importando o useNavigate
+import { ToastContainer, toast } from "react-toastify";
 import "./Login.css";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
-  const [username, setUsername] = useState(""); // Estado para armazenar o usuário
-  const [password, setPassword] = useState(""); // Estado para armazenar a senha
-  const [error, setError] = useState(null); // Estado para mensagens de erro
+  const [username, setUsername] = useState(""); 
+  const [password, setPassword] = useState(""); 
+  const navigate = useNavigate(); // Hook para navegação
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(null); // Resetando erro antes de enviar
-
+  
+    if (!username || !password) {
+      toast.error("Preencha todos os campos!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        closeButton: false,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "dark",
+        style: {
+          minWidth: "350px",
+          minHeight: "120px",
+          paddingTop: "100px",
+          padding: "20px",
+          backgroundColor: "#880707",
+        },
+      });
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
-
+  
+    console.log("Enviando para a API:", {
+      username,
+      password,
+    });
+  
     try {
       const response = await fetch("/login/", {
         method: "POST",
-        body: formData, // Enviando como form-data
+        body: formData,
       });
-
-      if (!response.ok) {
-        throw new Error("Usuário ou senha inválidos");
-      }
-
+  
       const result = await response.json();
-      console.log("Login bem-sucedido:", result);
-      alert("Login realizado com sucesso!");
-      // Aqui você pode redirecionar o usuário ou salvar o token no localStorage
-
+      console.log("Resposta da API:", result);
+  
+      if (!response.ok) {
+        throw new Error(result.message || "Usuário ou senha inválidos");
+      }
+  
+      toast.success("Login realizado com sucesso!", {
+        position: "top-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: false,
+        closeButton: false,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "dark",
+        style: {
+          minWidth: "350px",
+          minHeight: "120px",
+          paddingTop: "100px",
+          padding: "20px",
+          backgroundColor: "#016322",
+        },
+      });
+  
+      // Redirecionar para o dashboard
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+  
     } catch (error) {
-      setError("Usuário ou senha inválidos");
+      toast.error(error.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        closeButton: false,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "dark",
+        style: {
+          minWidth: "350px",
+          minHeight: "120px",
+          paddingTop: "100px",
+          padding: "20px",
+          backgroundColor: "#880707"
+        },
+      });
     }
   };
+  
 
   return (    
     <div>
       <img src="/logoClothes.png" alt="logo loja" id="logo" />
       <form onSubmit={handleSubmit} className="container">  
-        <img src="/perfil.png" alt="icone usuario" id="icone"/>  
         <h1>User Login</h1>
-        
+
         <div className="input-field">
           <input 
             type="text" 
             placeholder="Username" 
-            required
             value={username}
             onChange={(e) => setUsername(e.target.value)} 
           />
@@ -56,20 +119,21 @@ const Login = () => {
           <input 
             type="password" 
             placeholder="Password" 
-            required
             value={password}
             onChange={(e) => setPassword(e.target.value)} 
           />
         </div>
 
-        {error && <p className="error">{error}</p>} {/* Exibe erro se houver */}
-
         <button type="submit">Login</button>
 
         <div className="signup-link">
-          <button>New User</button>
+          <Link to="/novo_usuario">
+            <button type="button">New User</button>
+          </Link>
         </div>
       </form>
+
+      <ToastContainer />
     </div>
   );
 };
