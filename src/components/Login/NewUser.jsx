@@ -1,102 +1,62 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { showSuccessToast, showErrorToast } from "./toastConfig";
 import './NewUser.css';
 
 const NewUser = () => {
-    const [codigo, setCodigo] = useState("");
+    const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
-    const [description, setDescription] = useState("");
-    const [senha, setSenha] = useState("");
-    const [confirmarSenha, setConfirmarSenha] = useState("");
+    const [userDescription, setDescription] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setconfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (senha !== confirmarSenha) {
-            toast.error("As senhas não conferem!");
-            loading = false;
+        if (password !== confirmPassword) {
+            showErrorToast("As senhas não conferem!");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("username", codigo);
-        formData.append("password", senha);
-        formData.append("confirmPassword", confirmarSenha);
-        formData.append("email", email);
-        formData.append("userDescription", description);
-
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await fetch("/api/create_user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams({
-                    username: codigo,
-                    password: senha,
-                    confirmPassword: confirmarSenha,
-                    email: email,
-                    userDescription: description
+                    username,
+                    password,
+                    confirmPassword,
+                    email,
+                    userDescription
                 }),
             });
-            
+
             const result = await response.json();
 
             if (!response.ok) {
                 throw new Error(result.detail || "Erro ao cadastrar usuário");
             }
 
-            toast.success("Cadastro realizado com sucesso!", {
-                position: "top-right",
-                autoClose: false,
-                hideProgressBar: false,
-                closeOnClick: false,
-                closeButton: false,
-                pauseOnHover: false,
-                draggable: true,
-                theme: "dark",
-                style: {
-                    minWidth: "350px",
-                    minHeight: "120px",
-                    paddingTop: "100px",
-                    padding: "20px",
-                    backgroundColor: "#016322",
-                },
-
-
-            });
+            showSuccessToast("Cadastro realizado com sucesso!");
             
             setTimeout(() => {
-                navigate("/dashboard");
+                navigate("/");
             }, 2000);
-
-
         } catch (error) {
-
-            toast.error(`${error.message || "Erro ao cadastrar o usuário."}`, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                closeButton: false,
-                pauseOnHover: false,
-                draggable: true,
-                theme: "dark",
-                style: {
-                    minWidth: "350px",
-                    minHeight: "120px",
-                    paddingTop: "100px",
-                    padding: "20px",
-                    backgroundColor: "#880707"
-                },
-            });
+            showErrorToast(error.message || "Erro ao cadastrar o usuário.");
+        } finally {
+            setLoading(false);
         }
     };
+
+    const isButtonDisabled = !username || !password || !confirmPassword || loading;
 
     return (
         <div className="popup">
@@ -108,16 +68,16 @@ const NewUser = () => {
                         type="text" 
                         placeholder="Usuário" 
                         maxLength="20" 
-                        value={codigo} 
-                        onChange={(e) => setCodigo(e.target.value)} 
+                        value={username} 
+                        onChange={(e) => setUsername(e.target.value)} 
                     />
                 </div>
                 <div className="input-field">
                     <input 
                         type="text" 
                         placeholder="Nome" 
-                        maxLength="20" 
-                        value={description} 
+                        maxLength="30" 
+                        value={userDescription} 
                         onChange={(e) => setDescription(e.target.value)} 
                     />
                 </div>
@@ -125,7 +85,7 @@ const NewUser = () => {
                     <input 
                         type="email" 
                         placeholder="E-mail" 
-                        maxLength="20" 
+                        maxLength="50" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                     />
@@ -135,8 +95,8 @@ const NewUser = () => {
                         type="password" 
                         placeholder="Senha" 
                         maxLength="20" 
-                        value={senha} 
-                        onChange={(e) => setSenha(e.target.value)} 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
                     />
                 </div>
                 <div className="input-field">
@@ -144,17 +104,17 @@ const NewUser = () => {
                         type="password" 
                         placeholder="Confirmar Senha" 
                         maxLength="20" 
-                        value={confirmarSenha} 
-                        onChange={(e) => setConfirmarSenha(e.target.value)} 
+                        value={confirmPassword} 
+                        onChange={(e) => setconfirmPassword(e.target.value)} 
                     />
                 </div>
                 <button 
                     type="submit" 
-                    disabled={!codigo || !senha || !confirmarSenha}
+                    disabled={isButtonDisabled}
                 >Criar novo usuário
                 </button>
             </form>
-         <ToastContainer />
+            <ToastContainer />
         </div>
     );
 };
