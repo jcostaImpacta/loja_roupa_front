@@ -10,7 +10,7 @@ const NewUser = () => {
     const [description, setDescription] = useState("");
     const [senha, setSenha] = useState("");
     const [confirmarSenha, setConfirmarSenha] = useState("");
-    const [loading, setLoading] = useState(false);  // Controle de loading
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -18,6 +18,7 @@ const NewUser = () => {
 
         if (senha !== confirmarSenha) {
             toast.error("As senhas não conferem!");
+            loading = false;
             return;
         }
 
@@ -29,8 +30,8 @@ const NewUser = () => {
         formData.append("userDescription", description);
 
         try {
-            setLoading(true);  // Ativar loading
-            const response = await fetch("/create_usuario/", { // Alterado de /novo_usuario para /create_usuario/
+            setLoading(true);
+            const response = await fetch("/api/create_user/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -44,10 +45,10 @@ const NewUser = () => {
                 }),
             });
             
-            const result = await response.text();
+            const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || "Erro ao criar novo usuário");
+                throw new Error(result.detail || "Erro ao cadastrar usuário");
             }
 
             toast.success("Cadastro realizado com sucesso!", {
@@ -66,8 +67,10 @@ const NewUser = () => {
                     padding: "20px",
                     backgroundColor: "#016322",
                 },
+
+
             });
-            // ⏳ Aguarda 2 segundos e redireciona para o Dashboard
+            
             setTimeout(() => {
                 navigate("/dashboard");
             }, 2000);
@@ -99,11 +102,11 @@ const NewUser = () => {
         <div className="popup">
             <img src="/logoClothes.png" alt="logo loja" id="logo" />
             <form onSubmit={handleSubmit} className="form-container">
-                <h1>New User</h1>
+                <h1>Novo Usuário</h1>
                 <div className="input-field">
                     <input 
                         type="text" 
-                        placeholder="User Name" 
+                        placeholder="Usuário" 
                         maxLength="20" 
                         value={codigo} 
                         onChange={(e) => setCodigo(e.target.value)} 
@@ -112,7 +115,7 @@ const NewUser = () => {
                 <div className="input-field">
                     <input 
                         type="text" 
-                        placeholder="Name" 
+                        placeholder="Nome" 
                         maxLength="20" 
                         value={description} 
                         onChange={(e) => setDescription(e.target.value)} 
@@ -130,7 +133,7 @@ const NewUser = () => {
                 <div className="input-field">
                     <input 
                         type="password" 
-                        placeholder="Password" 
+                        placeholder="Senha" 
                         maxLength="20" 
                         value={senha} 
                         onChange={(e) => setSenha(e.target.value)} 
@@ -139,7 +142,7 @@ const NewUser = () => {
                 <div className="input-field">
                     <input 
                         type="password" 
-                        placeholder="Confirm Password" 
+                        placeholder="Confirmar Senha" 
                         maxLength="20" 
                         value={confirmarSenha} 
                         onChange={(e) => setConfirmarSenha(e.target.value)} 
@@ -147,8 +150,8 @@ const NewUser = () => {
                 </div>
                 <button 
                     type="submit" 
-                    disabled={!codigo || !senha || !confirmarSenha || senha !== confirmarSenha || loading}
-                >Create New Account
+                    disabled={!codigo || !senha || !confirmarSenha}
+                >Criar novo usuário
                 </button>
             </form>
          <ToastContainer />

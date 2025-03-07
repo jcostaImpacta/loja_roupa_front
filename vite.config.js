@@ -1,13 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import dotenv from "dotenv";
 
-// https://vite.dev/config/
+dotenv.config();
+
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/login": "http://127.0.0.1:8000",
-      "/create_usuario/": "http://127.0.0.1:8000" // Adicionado aqui
+      "/api": {
+        target: process.env.VITE_API_URL || "http://127.0.0.1:8000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""), // Remove /api antes de enviar ao backend
+      },
     },
   },
-})
+});

@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 const Login = () => {
   const [username, setUsername] = useState(""); 
   const [password, setPassword] = useState(""); 
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,7 +43,7 @@ const Login = () => {
     });
   
     try {
-      const response = await fetch("/login/", {
+      const response = await fetch("/api/login/", {
         method: "POST",
         body: formData,
       });
@@ -73,7 +73,6 @@ const Login = () => {
         },
       });
   
-      // Redirecionar para o dashboard
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -104,12 +103,12 @@ const Login = () => {
     <div>
       <img src="/logoClothes.png" alt="logo loja" id="logo" />
       <form onSubmit={handleSubmit} className="container">  
-        <h1>User Login</h1>
+        <h1>Login</h1>
 
         <div className="input-field">
           <input 
             type="text" 
-            placeholder="Username" 
+            placeholder="Usuário" 
             value={username}
             onChange={(e) => setUsername(e.target.value)} 
           />
@@ -118,7 +117,7 @@ const Login = () => {
         <div className="input-field">
           <input 
             type="password" 
-            placeholder="Password" 
+            placeholder="Senha" 
             value={password}
             onChange={(e) => setPassword(e.target.value)} 
           />
@@ -127,8 +126,8 @@ const Login = () => {
         <button type="submit">Login</button>
 
         <div className="signup-link">
-          <Link to="/novo_usuario">
-            <button type="button">New User</button>
+          <Link to="/new_user">
+            <button type="button">Novo Usuário</button>
           </Link>
         </div>
       </form>

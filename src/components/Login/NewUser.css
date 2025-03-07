@@ -62,9 +62,7 @@ button{
     font-weight: 700;
     text-shadow: none;
 }
-button:disabled{
-    cursor: default;
-}
+
 .error{
     color: #fff;
     text-align: center;
