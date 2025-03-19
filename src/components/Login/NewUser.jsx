@@ -60,7 +60,7 @@ const NewUser = () => {
 
     return (
         <div className="popup">
-            <img src="/logoClothes.png" alt="logo loja" id="logo" />
+            <div className="logo"><img src="/logoClothes.png" alt="logo loja" id="logo" /></div>
             <form onSubmit={handleSubmit} className="form-container">
                 <h1>Novo Usuário</h1>
                 <div className="input-field">

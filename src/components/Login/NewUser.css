@@ -1,4 +1,4 @@
-body{
+/* body{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,9 +9,22 @@ body{
   background-position: center;
   width: 405%;
   color: #fff;
-}
-#logo{
-    margin: 30px auto;
+} */
+ .logo{
+    position: absolute;
+    top: 0;
+ }
+.popup{
+display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  max-width: 100%;
+  background: linear-gradient(#2EAAE9, #0C2051);
+  background-size: cover;
+  background-position: center;
+  width: 405%;
+  color: #fff;  
 }
 .form-container{
     width: 450px;

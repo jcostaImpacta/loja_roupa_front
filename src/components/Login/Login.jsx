@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -37,7 +37,7 @@ const Login = () => {
       }
 
       showSuccessToast("Login realizado com sucesso!");
-      setTimeout(() => navigate("/dashboard"), 2000);
+      setTimeout(() => navigate("/products"), 2000);
     } catch (error) {
       showErrorToast(error.message);
     } finally {

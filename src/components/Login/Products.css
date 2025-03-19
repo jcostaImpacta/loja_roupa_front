@@ -1,7 +1,15 @@
+body{
+  background: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  max-width: 100%;
+} 
 .dashboard-container {
     text-align: center;
     margin-top: 50px;
-    color: white;
+    color: #ccc;
   }
   
   .dashboard-container button {
@@ -17,5 +25,4 @@
   
   .dashboard-container button:hover {
     background-color: #0036a3;
-  }
-  
+  } 

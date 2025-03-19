@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import App from "./App";
 import NewUser from "./components/Login/NewUser";
-import Dashboard from "./components/Login/Dashboard";
+import Products from "./components/Login/Products";
 
 function AppRouter() {
     return (
         <Routes>
             <Route path="/" element={<App />} />
             <Route path="/new_user" element={<NewUser />} />
-            <Route path="/dashboard" element={<Dashboard />} /> {}
+            <Route path="/products" element={<Products />} />
         </Routes>
     );
 }
