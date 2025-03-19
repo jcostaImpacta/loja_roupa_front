@@ -1,4 +1,4 @@
-/* body{
+body{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,15 +7,15 @@
   background: linear-gradient(#2EAAE9, #0C2051);
   background-size: cover;
   background-position: center;
-  width: 405%;
+  width: 100%;
   color: #fff;
-} */
- .logo{
+}
+.logo{
     position: absolute;
     top: 0;
  }
 .popup{
-display: flex;
+  display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;

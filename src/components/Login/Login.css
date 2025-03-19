@@ -1,12 +1,26 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  max-width: 100%;
+  background: linear-gradient(#2EAAE9, #0C2051);
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  color: #fff;
+}
+
 .container {
-    width: 450px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 40px;
-    box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.30);
-  }
+  width: 450px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 40px;
+  box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.30);
+}
+
   #icone{
     margin: 0 30%;
   }
