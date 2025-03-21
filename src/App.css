@@ -3,9 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  font-weight: 100;
-  text-shadow: #000 1px 1px;
-  color: #fff;
+  font-weight: 200;
 }
 
 .App {
@@ -18,7 +16,6 @@
   background-size: cover;
   background-position: center;
   width: 405%;
-  color: #fff;
 }
 
 button:disabled{

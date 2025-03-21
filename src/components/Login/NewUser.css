@@ -1,4 +1,4 @@
-/* body{
+body{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,7 +9,7 @@
   background-position: center;
   width: 405%;
   color: #fff;
-} */
+}
  .logo{
     position: absolute;
     top: 0;

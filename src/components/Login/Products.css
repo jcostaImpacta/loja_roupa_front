@@ -1,12 +1,15 @@
+*{
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
 body{
-  background: #ccc;
+  background-color: #ccc;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   max-width: 100%;
 } 
-.dashboard-container {
+/* .dashboard-container {
     text-align: center;
     margin-top: 50px;
     color: #ccc;
@@ -25,4 +28,4 @@ body{
   
   .dashboard-container button:hover {
     background-color: #0036a3;
-  } 
+  }  */

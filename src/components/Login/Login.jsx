@@ -37,6 +37,7 @@ const Login = () => {
       }
 
       showSuccessToast("Login realizado com sucesso!");
+      localStorage.setItem("username", result.username);
       setTimeout(() => navigate("/products"), 2000);
     } catch (error) {
       showErrorToast(error.message);
