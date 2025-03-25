@@ -20,7 +20,7 @@ const ProductGrid = () => {
   const [categorias, setCategorias] = useState([]);
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [filters, setFilters] = useState({ categoria: "", genero: "", valorMin: 1, valorMax: 1000 });
+  const [filters, setFilters] = useState({ categoria: "", genero: "", valorMin: 1, valorMax: 300 });
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -59,18 +59,27 @@ const ProductGrid = () => {
     navigate("/");
   };
 
-  const filteredProducts = produtos.filter(produto =>
-    produto.dc_produto.toLowerCase().includes(search.toLowerCase())
-  );
+  const searchValue = search || ""; 
 
-  const handleSliderChange = (event, newValue) => {
-    setFilters({
-      valorMin: newValue[0],
-      valorMax: newValue[1],
-    });
-  };
+  const filteredProducts = produtos.filter(produto => {
+    return (
+      (produto.dc_produto || "").toLowerCase().includes(searchValue.toLowerCase()) &&
+      (filters.categoria ? (produto.categoria || "").toLowerCase() === filters.categoria.toLowerCase() : true) &&
+      (filters.genero ? (produto.genero || "").toLowerCase() === filters.genero.toLowerCase() : true) &&
+      produto.vl_produto >= filters.valorMin && produto.vl_produto <= filters.valorMax
+    );
+  });
+  
 
-  const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+const handleSliderChange = (event, newValue) => {
+  setFilters({
+    ...filters,
+    valorMin: newValue[0],
+    valorMax: newValue[1],
+  });
+};
+
+const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   return (
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw" }}>
@@ -161,11 +170,12 @@ const ProductGrid = () => {
                 <MenuItem value="Sunga">Sunga</MenuItem>
                 <MenuItem value="Tênis">Tênis</MenuItem>
                 <MenuItem value="Vestido">Vestido</MenuItem>
-                {categorias.map((categoria) => (
-                  <MenuItem key={categoria.id} value={categoria.nome}>
-                    {categoria.nome} sx={{ width: "20vw" }}
-                  </MenuItem>
-                ))}
+                {categorias.length > 0 && categorias.map((categoria) => (
+                <MenuItem key={categoria.id} value={categoria.nome}>
+                  {categoria.nome}
+                </MenuItem>
+              ))}
+
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -189,7 +199,7 @@ const ProductGrid = () => {
               <Typography sx={{ color: '#001469' }}>Mínimo: R${filters.valorMin}</Typography>
               <Typography sx={{ color: '#001469' }}>Máximo: R${filters.valorMax}</Typography>
             </Box>
-            <Slider value={[filters.valorMin, filters.valorMax]} onChange={handleSliderChange} valueLabelDisplay="auto" valueLabelFormat={(value) => `R$ ${value}`} min={1} max={1000} sx={{ marginBottom: "1vh", color: '#001469' }} />
+            <Slider value={[filters.valorMin, filters.valorMax]} onChange={handleSliderChange} valueLabelDisplay="auto" valueLabelFormat={(value) => `R$ ${value}`} min={1} max={300} sx={{ marginBottom: "1vh", color: '#001469' }} />
           </Box>
         </Paper>
         <TableContainer component={Paper}>
@@ -222,7 +232,7 @@ const ProductGrid = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt:1}}>
           <Pagination count={Math.ceil(filteredProducts.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{"& .MuiPaginationItem-root": {color: "#001469"},"& .MuiPaginationItem-previousNext": {backgroundColor: "#001469",color:"#ddd","&:hover": {backgroundColor: "#003399"}
               },
             }}
