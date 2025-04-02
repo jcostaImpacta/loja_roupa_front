@@ -22,14 +22,15 @@ const ProductGrid = () => {
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [filters, setFilters] = useState({valorMin: 1, valorMax: 300 });
-  const [aplicarFiltro, setAplicarFiltro] = useState(true)
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-
   useEffect(() => {
-    setLoading(true);
+    fetchData();
+  }, []);
   
-    // Fazendo as duas requisições ao mesmo tempo
+  const fetchData = () => {
+    setLoading(true);
+    
     Promise.all([
       fetch("/api/get_products/", {
         method: "POST",
@@ -37,19 +38,18 @@ const ProductGrid = () => {
         body: JSON.stringify(filters),
       }).then((res) => res.json()),
   
-      fetch("/api/list/categoria/")
-        .then((res) => res.json())
+      fetch("/api/list/categoria/").then((res) => res.json()),
     ])
       .then(([produtosData, categoriasData]) => {
         setProdutos(produtosData);
-        setCategorias(categoriasData); 
+        setCategorias(categoriasData);
       })
       .catch((error) => console.error("Erro nas requisições:", error))
       .finally(() => setLoading(false));
-  }, [aplicarFiltro]);
+  };
     
   const handleClick = () =>{
-    setAplicarFiltro()
+    fetchData();
   }
   const handleFilterChange = (event) => {
     setFilters({ ...filters, [event.target.name]: event.target.value });
@@ -183,7 +183,7 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
             </Box>
           </Box>
           <Box sx={{ display: "flex", width: "16%", justifyContent: "flex-end", mx: "83%" }}>  
-            <Button variant="contained" onChange={handleClick} sx={{ backgroundColor: "#001469", color: "#ccc",textTransform:"capitalize", fontWeight:"bold",":hover": {backgroundColor: "#003399"}}}>Aplicar Filtros</Button>
+            <Button variant="contained" onClick={handleClick} sx={{ backgroundColor: "#001469", color: "#ccc",textTransform:"capitalize", fontWeight:"bold",":hover": {backgroundColor: "#003399"}}}>Aplicar Filtros</Button>
           </Box>
         </Paper>
         <TableContainer component={Paper}>
