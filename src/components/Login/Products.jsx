@@ -14,11 +14,13 @@ import './Products.css';
 import { useNavigate } from "react-router-dom";
 
 const ProductGrid = () => {
-  const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categorias, setCategorias] = useState([]);
+  const [generos, setGeneros] = useState([]);
+  const [publicos, setPublicos] = useState([]);
+  const [colecoes, setColecoes] = useState([]);
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [filters, setFilters] = useState({valorMin: 1, valorMax: 300 });
@@ -30,19 +32,29 @@ const ProductGrid = () => {
   
   const fetchData = () => {
     setLoading(true);
-    
     Promise.all([
+
       fetch("/api/get_products/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(filters),
-      }).then((res) => res.json()),
-  
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Erro na API: ${res.status}`);
+        }
+        return res.json();
+      }),
       fetch("/api/list/categoria/").then((res) => res.json()),
+      fetch("/api/list/genero/").then((res) => res.json()),
+      fetch("/api/list/publico/").then((res) => res.json()),
+      fetch("/api/list/colecao/").then((res) => res.json()),
     ])
-      .then(([produtosData, categoriasData]) => {
+      .then(([produtosData, categoriasData, generosData, publicosData, colecoesData]) => {
         setProdutos(produtosData);
         setCategorias(categoriasData);
+        setGeneros(generosData);
+        setPublicos(publicosData);
+        setColecoes(colecoesData);
       })
       .catch((error) => console.error("Erro nas requisições:", error))
       .finally(() => setLoading(false));
@@ -116,8 +128,7 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
               </InputAdornment>),}}/>
         <Button edge="start" color="inherit" onClick={handleMenuOpen} sx={{ backgroundColor: "none", boxShadow: "none", width: '1vw', marginLeft:'-2vw', "&:hover": { backgroundColor: "none" } }}>
           <AccountCircle sx={{ height: '4vh', width: '4vw', marginLeft: "80vw", marginTop: '4vh', backgroundColor: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" } }} />
-          <Typography variant="h6" sx={{ color: "#001469", marginTop: "4vh", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none", boxShadow: "none" } }}>
-          {username ? username : "Olá"} 
+          <Typography variant="h6" sx={{ color: "#001469", marginTop: "4vh", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none", boxShadow: "none" } }}>usuário
           {/* estou com dúvida nesse pedaço de código, era pra retornar o nome do usuário logado */}
         </Typography>
         </Button>
@@ -148,20 +159,21 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
             </FormControl>
             <FormControl sx={{ minWidth: "10vw" }}>
               <InputLabel>Gênero</InputLabel>
-              <Select name="genero" value={filters.genero}onChange={handleFilterChange}label="Gênero">
-                <MenuItem value="">Todos</MenuItem>
-                <MenuItem value="Masculino">Masculino</MenuItem>
-                <MenuItem value="Feminino">Feminino</MenuItem>
-                <MenuItem value="Unissex">Unissex</MenuItem>
+              <Select name="genero" value={filters.genero} onChange={handleFilterChange}label="Gênero">
+                <MenuItem>Todos</MenuItem>
+                {generos.map((genero) => (
+                <MenuItem key={genero.dc_genero} value={genero.id_genero}> {genero.dc_genero}</MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl sx={{}}>
               <FormControl sx={{ minWidth: "10vw" }}>
                 <InputLabel>Público</InputLabel>
                 <Select name="publico" value={filters.publico} onChange={handleFilterChange}label="Público">
-                  <MenuItem value="">Todos</MenuItem>
-                  <MenuItem value="Adulto">Adulto</MenuItem>
-                  <MenuItem value="Infantil">Infantil</MenuItem>
+                  <MenuItem>Todos</MenuItem>
+                  {publicos.map((publico) => (
+                <MenuItem key={publico.dc_publico} value={publico.id_publico}> {publico.dc_publico}</MenuItem>
+                ))}
                 </Select>
               </FormControl>
             </FormControl>
@@ -169,9 +181,10 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
               <FormControl sx={{ minWidth: "10vw" }}>
                 <InputLabel>Coleção</InputLabel>
                 <Select name="colecao" value={filters.colecao} onChange={handleFilterChange}label="Coleção">
-                  <MenuItem value="">Todas</MenuItem>
-                  <MenuItem value="Verão">Verão</MenuItem>
-                  <MenuItem value="Inverno">Inverno</MenuItem>
+                  <MenuItem>Todas</MenuItem>
+                  {colecoes.map((colecao) => (
+                <MenuItem key={colecao.dc_colecao} value={colecao.id_colecao}> {colecao.dc_colecao}</MenuItem>
+                ))}
                 </Select>
               </FormControl>
             </FormControl>
