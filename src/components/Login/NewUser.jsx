@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,7 +60,7 @@ const NewUser = () => {
 
     return (
         <div className="popup">
-            <img src="/logoClothes.png" alt="logo loja" id="logo" />
+            <div className="logo"><img src="/logoClothes.png" alt="logo loja" id="logo" /></div>
             <form onSubmit={handleSubmit} className="form-container">
                 <h1>Novo Usuário</h1>
                 <div className="input-field">
