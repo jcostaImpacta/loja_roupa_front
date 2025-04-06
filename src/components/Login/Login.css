@@ -1,3 +1,11 @@
+body {
+  background: linear-gradient(45deg, #2EAAE9, #1A6083);
+  height: 100vh; /* Certifique-se de que o fundo cubra a tela inteira */
+  margin: 0; /* Remova a margem padrão do body */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .container {
     width: 450px;
     background: rgba(255, 255, 255, 0.15);
