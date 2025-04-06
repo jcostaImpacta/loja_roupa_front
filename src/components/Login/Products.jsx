@@ -32,6 +32,7 @@ const ProductGrid = () => {
   
   const fetchData = () => {
     setLoading(true);
+    
     Promise.all([
 
       fetch("/api/get_products/", {
@@ -128,8 +129,7 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
               </InputAdornment>),}}/>
         <Button edge="start" color="inherit" onClick={handleMenuOpen} sx={{ backgroundColor: "none", boxShadow: "none", width: '1vw', marginLeft:'-2vw', "&:hover": { backgroundColor: "none" } }}>
           <AccountCircle sx={{ height: '4vh', width: '4vw', marginLeft: "80vw", marginTop: '4vh', backgroundColor: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" } }} />
-          <Typography variant="h6" sx={{ color: "#001469", marginTop: "4vh", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none", boxShadow: "none" } }}>usuário
-          {/* estou com dúvida nesse pedaço de código, era pra retornar o nome do usuário logado */}
+          <Typography variant="h6" sx={{ color: "#001469", marginTop: "4vh", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none", boxShadow: "none" } }}>
         </Typography>
         </Button>
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} sx={{ marginLeft: "40vw", marginTop: "2vh", backgroundColor: "none" }}>
