@@ -21,19 +21,46 @@ const ProductGrid = () => {
   const [generos, setGeneros] = useState([]);
   const [publicos, setPublicos] = useState([]);
   const [colecoes, setColecoes] = useState([]);
+  const [valor_min, setValorMin] = useState([]);
+  const [valor_max, setValorMax] = useState([]);
+  const [MinMaxPrice, setMinMaxPrice] = useState([]);
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [filters, setFilters] = useState({valorMin: 1, valorMax: 300 });
+  const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+
   useEffect(() => {
+    fetchFilters();
     fetchData();
   }, []);
   
+  const fetchFilters = () =>{
+    setLoading(true);
+    Promise.all([
+
+      fetch("/api/list/categoria/").then((res) => res.json()),
+      fetch("/api/list/genero/").then((res) => res.json()),
+      fetch("/api/list/publico/").then((res) => res.json()),
+      fetch("/api/list/colecao/").then((res) => res.json()),
+      fetch("/api/list/min_max_price/").then((res) => res.json()),
+    ])
+      .then(([categoriasData, generosData, publicosData, colecoesData, MinMaxPriceData]) => {
+        setCategorias(categoriasData);
+        setGeneros(generosData);
+        setPublicos(publicosData);
+        setColecoes(colecoesData);
+        setMinMaxPrice(MinMaxPriceData);
+        setValorMin(MinMaxPriceData?.preco_min);
+        setValorMax(MinMaxPriceData?.preco_max);
+        setFilters({valor_min: MinMaxPriceData?.preco_min, valor_max: MinMaxPriceData?.preco_max})
+      })
+      .catch((error) => console.error("Erro nas requisições:", error))
+      .finally(() => setLoading(false));
+  }
+
   const fetchData = () => {
     setLoading(true);
-    
-    Promise.all([
 
       fetch("/api/get_products/", {
         method: "POST",
@@ -44,19 +71,7 @@ const ProductGrid = () => {
           throw new Error(`Erro na API: ${res.status}`);
         }
         return res.json();
-      }),
-      fetch("/api/list/categoria/").then((res) => res.json()),
-      fetch("/api/list/genero/").then((res) => res.json()),
-      fetch("/api/list/publico/").then((res) => res.json()),
-      fetch("/api/list/colecao/").then((res) => res.json()),
-    ])
-      .then(([produtosData, categoriasData, generosData, publicosData, colecoesData]) => {
-        setProdutos(produtosData);
-        setCategorias(categoriasData);
-        setGeneros(generosData);
-        setPublicos(publicosData);
-        setColecoes(colecoesData);
-      })
+      }).then((produtosData) => {setProdutos(produtosData);})
       .catch((error) => console.error("Erro nas requisições:", error))
       .finally(() => setLoading(false));
   };
@@ -88,8 +103,8 @@ const ProductGrid = () => {
 const handleSliderChange = (event, newValue) => {
   setFilters({
     ...filters,
-    valorMin: newValue[0],
-    valorMax: newValue[1],
+    valor_min: newValue[0],
+    valor_max: newValue[1],
   });
 };
 
@@ -190,9 +205,9 @@ const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page
             </FormControl>
             
             <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1}}>
-              <Typography sx={{ color: "#001469", mr: 1, fontSize:16}}> R${filters.valorMin}</Typography>
-              <Slider value={[filters.valorMin, filters.valorMax]} onChange={handleSliderChange} valueLabelDisplay="auto" valueLabelFormat={(value) => `R$ ${value}`} min={1} max={300} sx={{ color: "#001469", flexGrow: 1, mx: 2 }}/>
-              <Typography sx={{ color: "#001469", ml: 1 }}>R${filters.valorMax}</Typography>
+              <Typography sx={{ color: "#001469", mr: 1, fontSize:16}}> R${valor_min}</Typography>
+              <Slider value={[filters.valor_min, filters.valor_max]} onChange={handleSliderChange} valueLabelDisplay="auto" valueLabelFormat={(value) => `R$ ${value}`} min={MinMaxPrice.preco_min} max={MinMaxPrice.preco_max} sx={{ color: "#001469", flexGrow: 1, mx: 2 }}/>
+              <Typography sx={{ color: "#001469", ml: 1 }}>R${valor_max}</Typography>
             </Box>
           </Box>
           <Box sx={{ display: "flex", width: "16%", justifyContent: "flex-end", mx: "83%" }}>  
