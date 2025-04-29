@@ -121,95 +121,40 @@ const ProductGrid = () => {
 
   return (
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw" }}>
-      <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, "& .MuiDrawer-paper": { width: "10vw", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
-        <Toolbar >
+      <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
+        <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
           <Typography variant="h6">
-            <Box component="img" src="logoClothes.png" alt="logo" sx={{ width: 180, height: "auto", marginLeft: "none" }} />
+          <Box component="img" src="logoClothes.png" alt="logo" sx={{ width: "12vw", height: "auto", textAlign:"center" }} />
           </Typography>
         </Toolbar>
         <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
           <Button edge="start" color="inherit" onClick={() => navigate("/products")} sx={{ backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" } }}>
-            <DashboardIcon />Produtos
+            <DashboardIcon/>Produtos
           </Button>
         </AppBar>
-        <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", color: "#ddd", marginTop: "84vh", "&:hover": { backgroundColor: "none" } }}>
-          <ExitToAppIcon /> Sair
-        </Button>
+        <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+          <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
+            <ExitToAppIcon/> Sair
+          </Button>
+        </AppBar>
       </Drawer>
 
       <Box sx={{ width: "70vw", ml: "10vw", mt: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-          <TextField
-            placeholder="Buscar..."
-            variant="outlined"
-            value={search}
-            onChange={handleSearchChange}
-            sx={{
-              width: "25vw",
-              backgroundColor: "#eee",
-              borderRadius: "8px",
-              boxShadow: 3,
-              "&:hover": { backgroundColor: "none", border: "#001469" }
-            }}
+          <TextField placeholder="Buscar..." variant="outlined" value={search} onChange={handleSearchChange} sx={{width: "25vw",backgroundColor: "#eee",borderRadius: "8px",boxShadow: 3,"&:hover": { backgroundColor: "none", border: "#001469" }}}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <SearchIcon sx={{ color: "#001469" }} />
                 </InputAdornment>
-              ),
-            }}
-          />
-          
-          <Button
-            edge="end"
-            color="inherit"
-            onClick={handleMenuOpen}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              width: 'auto',
-              height: 'auto',
-              backgroundColor: "transparent",
-              boxShadow: "none",
-              "&:hover": { backgroundColor: "transparent", boxShadow: "none" },
-            }}
-          >
-            <AccountCircle
-              sx={{
-                height: '4vh',
-                width: '4vw',
-                color: "#001469",
-                backgroundColor: "transparent",
-                "&:hover": { backgroundColor: "transparent" }
-              }}
-            />
+              ),}}/>
+          <Button sx={{width: "10vw", color: "#ccc", fontWeight: "bold", backgroundColor: "#001469", textTransform: "capitalize", marginLeft:"25vw",":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
+          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
+            <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
             <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
           </Button>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem
-              onClick={handleLogout}
-              sx={{
-                backgroundColor: "none",
-                boxShadow: "none",
-                color: "#001469",
-                "&:hover": { backgroundColor: "none", boxShadow: "none" }
-              }}
-            >
-              Sair
-            </MenuItem>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
+            <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
           </Menu>
         </Box>
         <Paper sx={{ width: "70vw", p: 2, mb: "2vh", boxShadow: 3, backgroundColor: "#eee", borderRadius: "8px" }}>
