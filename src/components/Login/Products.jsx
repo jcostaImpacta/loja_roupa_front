@@ -34,7 +34,7 @@ const ProductGrid = () => {
   useEffect(() => {
     fetchFilters();
     fetchData();
-  }, []);
+  },[]);
 
   const fetchFilters = () => {
     setLoading(true);
@@ -132,6 +132,9 @@ const ProductGrid = () => {
             <DashboardIcon/>Produtos
           </Button>
         </AppBar>
+        <Button sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
+          <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
+        </Button>
         <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
           <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
             <ExitToAppIcon/> Sair
