@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar, Toolbar, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, CircularProgress, MenuItem, Menu, Select, FormControl, InputLabel, Box, TextField,
@@ -11,7 +12,6 @@ import TuneIcon from '@mui/icons-material/Tune';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import './Products.css';
-import { useNavigate } from "react-router-dom";
 
 const ProductGrid = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const ProductGrid = () => {
   useEffect(() => {
     fetchFilters();
     fetchData();
-  },[]);
+  }, []);
 
   const fetchFilters = () => {
     setLoading(true);
@@ -58,7 +58,6 @@ const ProductGrid = () => {
       .catch((error) => console.error("Erro nas requisições:", error))
       .finally(() => setLoading(false));
   }
-
   const fetchData = () => {
     setLoading(true);
     fetch("/api/get_products/", {
@@ -77,6 +76,21 @@ const ProductGrid = () => {
       .finally(() => setLoading(false));
   };
 
+  const fetchOrder = async () => {
+    try {
+      const response = await fetch("/api/new_order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+      const orderData = await response.json();
+      localStorage.setItem("order", JSON.stringify(orderData));
+      navigate("/new_order");
+    } catch (error) {
+      console.error("Erro ao iniciar nova venda:", error);
+    }
+  };  
   const handleClick = () => {
     fetchData();
   }
@@ -120,7 +134,7 @@ const ProductGrid = () => {
   const paginatedProducts = filteredProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   return (
-    <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw" }}>
+    <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw", overflowX: "hidden" }}>
       <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
         <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
           <Typography variant="h6">
@@ -132,9 +146,11 @@ const ProductGrid = () => {
             <DashboardIcon/>Produtos
           </Button>
         </AppBar>
-        <Button sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
-          <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
-        </Button>
+        <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+          <Button onClick={fetchOrder} edge="start" color="inherit" sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
+            <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
+          </Button>
+        </AppBar>
         <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
           <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
             <ExitToAppIcon/> Sair
@@ -151,7 +167,7 @@ const ProductGrid = () => {
                   <SearchIcon sx={{ color: "#001469" }} />
                 </InputAdornment>
               ),}}/>
-          <Button sx={{width: "10vw", color: "#ccc", fontWeight: "bold", backgroundColor: "#001469", textTransform: "capitalize", marginLeft:"25vw",":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
+          <Button onClick={fetchOrder} sx={{width: "10vw", color: "#ccc", fontWeight: "bold", backgroundColor: "#001469", textTransform: "capitalize", marginLeft:"25vw",":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
           <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
             <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
             <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
