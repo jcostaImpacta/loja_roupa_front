@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
+import {AppBar, Badge,Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -93,7 +93,9 @@ export default function Order() {
   };
 
   return (
+    // Container central
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
+      {/* Sidebar esquerda */}
       <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
               <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
                 <Typography variant="h6">
@@ -124,15 +126,26 @@ export default function Order() {
       <Box sx={{ display:"flex",width:"90vw",flexGrow: 1, p: 3, backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
 
         <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
-          <Box sx={{ display: "flex", justifyContent: "end", alignItems: "center", mb: 3 }}>
-          
-          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
-              <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
-              <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
+          <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
+          {/* <Button sx={{backgroundColor: "none", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw","&:hover": { backgroundColor: "none", boxShadow: "none"  }}}>
+
+            <Box component="img" src="caixa-azul.png" alt="caixa aberta" sx={{height: "24px"}}/>
+            
+          </Button> */}
+          <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
+            <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{ "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
+              <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ height: "24px" }} />
+            </Badge>
+          </IconButton>
+
+          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "none", boxShadow: "none","&:hover": { backgroundColor: "none", boxShadow: "none" },}}>
+              <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "none", "&:hover": { backgroundColor: "none" }}}/>
+              <Typography sx={{ color: "#001469", fontWeight: "bold", paddingRight:"1vw" }}>{user.descricao}</Typography>
             </Button>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
               <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
             </Menu>
+
           </Box>
               <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
               <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
