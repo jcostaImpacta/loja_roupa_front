@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
+import {AppBar, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Menu from '@mui/material/Menu';
 import './Order.css';
 
 const produtosMock = [
@@ -14,12 +16,26 @@ const produtosMock = [
 ];
 
 export default function Order() {
+  const navigate = useNavigate();
   const [modoVendaAtivo, setModoVendaAtivo] = useState(false);
   const [cart, setCart] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
-  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const [anchorEl, setAnchorEl] = useState(null);
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    setAnchorEl(null);
+    navigate("/");
+  };
   const iniciarVenda = () => setModoVendaAtivo(true);
 
   const abrirResumo = () => setResumoAberto(true);
@@ -67,10 +83,7 @@ export default function Order() {
     );
   };
 
-  const valorTotal = cart.reduce(
-    (total, item) => total + item.quantidade * item.valor,
-    0
-  );
+  const valorTotal = cart.reduce((total, item) => total + item.quantidade * item.valor, 0);
 
   const finalizarPedido = () => {
     console.log("Pedido finalizado:", cart);
@@ -92,50 +105,54 @@ export default function Order() {
                   <DashboardIcon/>Produtos
                 </Button>
               </AppBar>
+
+
               <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
                 <Button onClick={fetchOrder} edge="start" color="inherit" sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
                   <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
                 </Button>
               </AppBar>
+
+
               <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
                 <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
                   <ExitToAppIcon/> Sair
                 </Button>
               </AppBar>
             </Drawer>
-      <Box sx={{ flexGrow: 1, p: 3, marginLeft: "15vw", backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
-            <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
-              {modoVendaAtivo && (
-                <div style={{ marginTop: 30 }}>
-                  {produtosMock.map((produto) => (
-                    <div
-                      key={produto.id}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 10,
-                      }}
-                    >
-                      <span>
-                        {produto.nome} - R$ {produto.valor}
-                      </span>
-                      <Button
-                        variant="contained"
-                        onClick={() => adicionarProduto(produto)}
-                      >
-                        Inserir
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {!modoVendaAtivo ? (
-                <Button variant="contained" onClick={iniciarVenda} sx={{marginTop:"20px", backgroundColor: "#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
-              ) : (
-                <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
-              )}
-            </Box>
+
+      <Box sx={{ display:"flex",width:"90vw",flexGrow: 1, p: 3, backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
+
+        <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
+          <Box sx={{ display: "flex", justifyContent: "end", alignItems: "center", mb: 3 }}>
+          
+          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
+              <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
+              <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
+            </Button>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
+              <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
+            </Menu>
+          </Box>
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
+              <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
+                {modoVendaAtivo && (
+                  <div style={{ marginTop: 30 }}>
+                    {produtosMock.map((produto) => (
+                      <div key={produto.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10,}}>
+                        <span>{produto.nome} - R$ {produto.valor}</span>
+                        <Button variant="contained" onClick={() => adicionarProduto(produto)}>Inserir</Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {!modoVendaAtivo ? (
+                  <Button variant="contained" onClick={iniciarVenda} sx={{marginTop:"20px", backgroundColor: "#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
+                ) : (
+                  <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
+                )}
+              </Box>
+        </Box>
             {/* Modal de Resumo */}
             <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
               <DialogTitle>Resumo do Pedido</DialogTitle>
