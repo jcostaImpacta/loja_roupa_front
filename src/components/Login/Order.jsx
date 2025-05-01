@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
+import {AppBar, Badge,Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -23,6 +23,8 @@ export default function Order() {
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   const [anchorEl, setAnchorEl] = useState(null);
+  const [produtos, setProdutos] = useState(produtosMock)
+  
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -127,11 +129,6 @@ export default function Order() {
 
         <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
           <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
-          {/* <Button sx={{backgroundColor: "none", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw","&:hover": { backgroundColor: "none", boxShadow: "none"  }}}>
-
-            <Box component="img" src="caixa-azul.png" alt="caixa aberta" sx={{height: "24px"}}/>
-            
-          </Button> */}
           <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
             <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{ "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
               <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ height: "24px" }} />
@@ -151,12 +148,32 @@ export default function Order() {
               <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
                 {modoVendaAtivo && (
                   <div style={{ marginTop: 30 }}>
-                    {produtosMock.map((produto) => (
-                      <div key={produto.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10,}}>
-                        <span>{produto.nome} - R$ {produto.valor}</span>
-                        <Button variant="contained" onClick={() => adicionarProduto(produto)}>Inserir</Button>
-                      </div>
-                    ))}
+                    <TableContainer sx={{  width:"55vw" }}>
+                        <Table>
+                          <TableHead sx={{color:"#ccc"}}>
+                            <TableRow sx={{backgroundColor:"#001469", color:"#ccc"}}>
+                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              }}>Produto</TableCell>
+                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              }} align="center">Preço</TableCell>
+                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              }}align="center">Ações</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {produtos.map((produto) => (
+                              <TableRow key={produto.id}>
+                                <TableCell>{produto.nome}</TableCell>
+                                <TableCell align="right">R$ {produto.valor.toFixed(2)}</TableCell>
+                                <TableCell align="right">
+                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize"}}>Adicionar</Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+
                   </div>
                 )}
                 {!modoVendaAtivo ? (
