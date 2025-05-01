@@ -1,6 +1,10 @@
 import { useState } from "react";
-import {Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import {AppBar, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, Toolbar,Typography, IconButton, List, ListItem, ListItemText,} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import './Order.css';
 
 const produtosMock = [
   { id: 1, nome: "Produto A", valor: 35.9 },
@@ -14,6 +18,7 @@ export default function Order() {
   const [cart, setCart] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
+  const navigate = useNavigate();
 
   const iniciarVenda = () => setModoVendaAtivo(true);
 
@@ -38,7 +43,21 @@ export default function Order() {
       setCart([...cart, { ...produto, quantidade: 1 }]);
     }
   };
-
+  const fetchOrder = async () => {
+    try {
+      const response = await fetch("/api/new_order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+      const orderData = await response.json();
+      localStorage.setItem("order", JSON.stringify(orderData));
+      navigate("/new_order");
+    } catch (error) {
+      console.error("Erro ao iniciar nova venda:", error);
+    }
+  }; 
   const alterarQuantidade = (id, delta) => {
     setCart((prev) =>
       prev
@@ -61,137 +80,123 @@ export default function Order() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <Typography variant="h5">Área de Vendas</Typography>
+    <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
+      <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
+              <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
+                <Typography variant="h6">
+                <Box component="img" src="logoClothes.png" alt="logo" sx={{ width: "12vw", height: "auto", textAlign:"center" }} />
+                </Typography>
+              </Toolbar>
+              <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+                <Button edge="start" color="inherit" onClick={() => navigate("/products")} sx={{ backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" } }}>
+                  <DashboardIcon/>Produtos
+                </Button>
+              </AppBar>
+              <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+                <Button onClick={fetchOrder} edge="start" color="inherit" sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
+                  <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
+                </Button>
+              </AppBar>
+              <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+                <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
+                  <ExitToAppIcon/> Sair
+                </Button>
+              </AppBar>
+            </Drawer>
+      <Box sx={{ flexGrow: 1, p: 3, marginLeft: "15vw", backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
+            <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
+              {modoVendaAtivo && (
+                <div style={{ marginTop: 30 }}>
+                  {produtosMock.map((produto) => (
+                    <div
+                      key={produto.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span>
+                        {produto.nome} - R$ {produto.valor}
+                      </span>
+                      <Button
+                        variant="contained"
+                        onClick={() => adicionarProduto(produto)}
+                      >
+                        Inserir
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!modoVendaAtivo ? (
+                <Button variant="contained" onClick={iniciarVenda} sx={{marginTop:"20px", backgroundColor: "#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
+              ) : (
+                <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
+              )}
+            </Box>
+            {/* Modal de Resumo */}
+            <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
+              <DialogTitle>Resumo do Pedido</DialogTitle>
+              <DialogContent>
+                {cart.length === 0 ? (
+                  <Typography>Nenhum item no carrinho.</Typography>
+                ) : (
+                  <List>
+                    {cart.map((item) => (
+                      <ListItem key={item.id} secondaryAction={
+                        <>
+                          <IconButton onClick={() => alterarQuantidade(item.id, -1)}>
+                            <Remove />
+                          </IconButton>
+                          <Typography>{item.quantidade}</Typography>
+                          <IconButton onClick={() => alterarQuantidade(item.id, 1)}>
+                            <Add />
+                          </IconButton>
+                        </>
+                      }>
+                        <ListItemText
+                          primary={item.nome}
+                          secondary={`R$ ${item.valor} cada`}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+                <Typography variant="h6" style={{ marginTop: 10 }}>
+                  Total: R$ {valorTotal.toFixed(2)}
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={fecharResumo}>Cancelar</Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={abrirConfirmacao}
+                  disabled={cart.length === 0}
+                >
+                  Finalizar Venda
+                </Button>
+              </DialogActions>
+            </Dialog>
 
-      {!modoVendaAtivo ? (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={iniciarVenda}
-          style={{ marginTop: 20 }}
-        >
-          Nova Venda
-        </Button>
-      ) : (
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={abrirResumo}
-          style={{ marginTop: 20 }}
-        >
-          Finalizar Pré-venda
-        </Button>
-      )}
-
-      {modoVendaAtivo && (
-        <div style={{ marginTop: 30 }}>
-          {produtosMock.map((produto) => (
-            <div
-              key={produto.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <span>
-                {produto.nome} - R$ {produto.valor}
-              </span>
-              <Button
-                variant="contained"
-                onClick={() => adicionarProduto(produto)}
-              >
-                Inserir
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Modal de Resumo */}
-      <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
-        <DialogTitle>Resumo do Pedido</DialogTitle>
-        <DialogContent>
-          {cart.length === 0 ? (
-            <Typography>Nenhum item no carrinho.</Typography>
-          ) : (
-            <List>
-              {cart.map((item) => (
-                <ListItem key={item.id} secondaryAction={
-                  <>
-                    <IconButton onClick={() => alterarQuantidade(item.id, -1)}>
-                      <Remove />
-                    </IconButton>
-                    <Typography>{item.quantidade}</Typography>
-                    <IconButton onClick={() => alterarQuantidade(item.id, 1)}>
-                      <Add />
-                    </IconButton>
-                  </>
-                }>
-                  <ListItemText
-                    primary={item.nome}
-                    secondary={`R$ ${item.valor} cada`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          )}
-          <Typography variant="h6" style={{ marginTop: 10 }}>
-            Total: R$ {valorTotal.toFixed(2)}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={fecharResumo}>Cancelar</Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={abrirConfirmacao}
-            disabled={cart.length === 0}
-          >
-            Finalizar Venda
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Modal de Confirmação */}
-      <Dialog open={confirmacaoAberta} onClose={fecharConfirmacao}>
-        <DialogTitle>Confirmar Venda</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Tem certeza que deseja finalizar esta venda?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={fecharConfirmacao}>Cancelar</Button>
-          <Button variant="contained" color="success" onClick={finalizarPedido}>
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+            {/* Modal de Confirmação */}
+            <Dialog open={confirmacaoAberta} onClose={fecharConfirmacao}>
+              <DialogTitle>Confirmar Venda</DialogTitle>
+              <DialogContent>
+                <Typography>
+                  Tem certeza que deseja finalizar esta venda?
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={fecharConfirmacao}>Cancelar</Button>
+                <Button variant="contained" color="success" onClick={finalizarPedido}>
+                  Confirmar
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Box>
+    </Box>
   );
 }
-// Order.jsx
-// export const createOrder = async () => {
-//     try {
-//       const response = await fetch("/api/order", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           // dados da venda, se precisar
-//         }),
-//       });
-  
-//       if (!response.ok) throw new Error("Erro ao criar pedido");
-  
-//       const data = await response.json();
-//       return data;
-//     } catch (error) {
-//       console.error("Erro na criação do pedido:", error);
-//       throw error;
-//     }
-//   };
-  
