@@ -24,7 +24,7 @@ export default function Order() {
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   const [anchorEl, setAnchorEl] = useState(null);
-  const [produtos, setProdutos] = useState(produtosMock)
+  const [produtos] = useState(produtosMock)
 
 
   const handleMenuOpen = (event) => {
@@ -39,7 +39,7 @@ export default function Order() {
     setAnchorEl(null);
     navigate("/");
   };
-  const iniciarVenda = () => setModoVendaAtivo(true);
+  // const iniciarVenda = () => setModoVendaAtivo(true);
 
   const abrirResumo = () => setResumoAberto(true);
   const fecharResumo = () => setResumoAberto(false);
@@ -131,8 +131,8 @@ export default function Order() {
         <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
           <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
           <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
-            <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{ "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
-              <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ height: "24px" }} />
+            <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{borderRadius:"100%", "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
+              <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"34px", maxWidth:"34px" }} />
             </Badge>
           </IconButton>
 
@@ -170,15 +170,17 @@ export default function Order() {
                               <TableRow key={produto.id}>
                                 <TableCell sx={{color:"#001469"}}>{produto.nome}</TableCell>
                                 <TableCell align="center" sx={{color:"#001469"}}>R$ {produto.valor.toFixed(2)}</TableCell>
-                                <TableCell align="right">
-                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize"}}>Adicionar</Button>
+                                <TableCell align="center">
+                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px"}}>Adicionar</Button>
                                 </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
                         </Table>
                       </TableContainer>
-                      <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
+                      <Box align="center">
+                        <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"250px", ":hover": { backgroundColor: "#003399" }}}>Finalizar Venda</Button>
+                      </Box>
                   </div>
                 )}
               </Box>
