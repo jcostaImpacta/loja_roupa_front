@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
+import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
 
 const produtosMock = [
@@ -17,14 +18,14 @@ const produtosMock = [
 
 export default function Order() {
   const navigate = useNavigate();
-  const [modoVendaAtivo, setModoVendaAtivo] = useState(false);
+  const [modoVendaAtivo, setModoVendaAtivo] = useState(true);
   const [cart, setCart] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
   const [anchorEl, setAnchorEl] = useState(null);
   const [produtos, setProdutos] = useState(produtosMock)
-  
+
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +76,7 @@ export default function Order() {
     } catch (error) {
       console.error("Erro ao iniciar nova venda:", error);
     }
-  }; 
+  };
   const alterarQuantidade = (id, delta) => {
     setCart((prev) =>
       prev
@@ -91,7 +92,7 @@ export default function Order() {
     console.log("Pedido finalizado:", cart);
     fecharConfirmacao();
     setCart([]);
-    setModoVendaAtivo(false);
+    setModoVendaAtivo(true);
   };
 
   return (
@@ -142,16 +143,20 @@ export default function Order() {
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
               <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
             </Menu>
-
           </Box>
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
-              <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", }}>Área de Vendas</Typography>
+              
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "initial", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
+              <Box sx={{ display: "flex", alignItems: "center", flexDirection:"row",  marginTop: 2 }}>
+                <ShoppingBagRoundedIcon sx={{display:"flex",height: "30px", width:"30px", marginRight:"3px"}}/>
+                <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", textAlign:"initial" }}>Área de Vendas</Typography>
+              </Box>
+              {/* <Box component="img" src="delivery.png" alt="caixa aberta" sx={{height: "6vw", width:"6vw", textAlign:"center", marginRight:"3px"}}></Box> */}
                 {modoVendaAtivo && (
                   <div style={{ marginTop: 30 }}>
                     <TableContainer sx={{  width:"55vw" }}>
                         <Table>
                           <TableHead sx={{color:"#ccc"}}>
-                            <TableRow sx={{backgroundColor:"#001469", color:"#ccc"}}>
+                            <TableRow sx={{backgroundImage: "linear-gradient(45deg, #2EAAE9,#0C2051)", color:"#ccc"}}>
                               <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
                               }}>Produto</TableCell>
                               <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
@@ -163,8 +168,8 @@ export default function Order() {
                           <TableBody>
                             {produtos.map((produto) => (
                               <TableRow key={produto.id}>
-                                <TableCell>{produto.nome}</TableCell>
-                                <TableCell align="right">R$ {produto.valor.toFixed(2)}</TableCell>
+                                <TableCell sx={{color:"#001469"}}>{produto.nome}</TableCell>
+                                <TableCell align="center" sx={{color:"#001469"}}>R$ {produto.valor.toFixed(2)}</TableCell>
                                 <TableCell align="right">
                                   <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize"}}>Adicionar</Button>
                                 </TableCell>
@@ -173,13 +178,8 @@ export default function Order() {
                           </TableBody>
                         </Table>
                       </TableContainer>
-
+                      <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
                   </div>
-                )}
-                {!modoVendaAtivo ? (
-                  <Button variant="contained" onClick={iniciarVenda} sx={{marginTop:"20px", backgroundColor: "#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Nova Venda</Button>
-                ) : (
-                  <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"20vw", ":hover": { backgroundColor: "#003399" }}}>Finalizar Pré-venda</Button>
                 )}
               </Box>
         </Box>
