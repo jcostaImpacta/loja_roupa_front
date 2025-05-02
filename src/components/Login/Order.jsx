@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
+import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import Menu from '@mui/material/Menu';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
@@ -49,7 +50,6 @@ export default function Order() {
     setConfirmacaoAberta(true);
   };
   const fecharConfirmacao = () => setConfirmacaoAberta(false);
-
   const adicionarProduto = (produto) => {
     const existente = cart.find((p) => p.id === produto.id);
     if (existente) {
@@ -132,12 +132,12 @@ export default function Order() {
           <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
           <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
             <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{borderRadius:"100%", "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
-              <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"34px", maxWidth:"34px" }} />
+              <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"30px", maxWidth:"30px" }} />
             </Badge>
           </IconButton>
 
           <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "none", boxShadow: "none","&:hover": { backgroundColor: "none", boxShadow: "none" },}}>
-              <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "none", "&:hover": { backgroundColor: "none" }}}/>
+              <AccountCircle sx={{maxHeight:"34px", maxWidth:"34px", color: "#001469", marginRight:"1vw",backgroundColor: "none", "&:hover": { backgroundColor: "none" }}}/>
               <Typography sx={{ color: "#001469", fontWeight: "bold", paddingRight:"1vw" }}>{user.descricao}</Typography>
             </Button>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
@@ -147,31 +147,30 @@ export default function Order() {
               
               <Box sx={{ display: "flex", flexDirection: "column", alignItems: "initial", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", flexDirection:"row",  marginTop: 2 }}>
-                <ShoppingBagRoundedIcon sx={{display:"flex",height: "30px", width:"30px", marginRight:"3px"}}/>
+                <ShoppingBagRoundedIcon sx={{display:"flex",height: "30px", width:"30px", marginRight:"8px"}}/>
                 <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", textAlign:"initial" }}>Área de Vendas</Typography>
               </Box>
-              {/* <Box component="img" src="delivery.png" alt="caixa aberta" sx={{height: "6vw", width:"6vw", textAlign:"center", marginRight:"3px"}}></Box> */}
                 {modoVendaAtivo && (
                   <div style={{ marginTop: 30 }}>
                     <TableContainer sx={{  width:"55vw" }}>
                         <Table>
                           <TableHead sx={{color:"#ccc"}}>
                             <TableRow sx={{backgroundImage: "linear-gradient(45deg, #2EAAE9,#0C2051)", color:"#ccc"}}>
-                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              <TableCell sx={{color:"#ccc",textTransform:"capitalize"
                               }}>Produto</TableCell>
-                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              <TableCell sx={{color:"#ccc",textTransform:"capitalize"
                               }} align="center">Preço</TableCell>
-                              <TableCell sx={{color:"#ccc", fontWeight:"bold", textTransform:"capitalize"
+                              <TableCell sx={{color:"#ccc",textTransform:"capitalize"
                               }}align="center">Ações</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
                             {produtos.map((produto) => (
                               <TableRow key={produto.id}>
-                                <TableCell sx={{color:"#001469"}}>{produto.nome}</TableCell>
-                                <TableCell align="center" sx={{color:"#001469"}}>R$ {produto.valor.toFixed(2)}</TableCell>
+                                <TableCell>{produto.nome}</TableCell>
+                                <TableCell align="center">R$ {produto.valor.toFixed(2)}</TableCell>
                                 <TableCell align="center">
-                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px"}}>Adicionar</Button>
+                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#003399", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#001469" }}}>Adicionar</Button>
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -179,7 +178,7 @@ export default function Order() {
                         </Table>
                       </TableContainer>
                       <Box align="center">
-                        <Button variant="contained" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#001469", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"250px", ":hover": { backgroundColor: "#003399" }}}>Finalizar Venda</Button>
+                        <Button variant="contained" color="primary" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#003399", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"250px", ":hover": { backgroundColor: "#001469" }}}>Finalizar Venda</Button>
                       </Box>
                   </div>
                 )}
@@ -187,63 +186,63 @@ export default function Order() {
         </Box>
             {/* Modal de Resumo */}
             <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
-              <DialogTitle>Resumo do Pedido</DialogTitle>
-              <DialogContent>
-                {cart.length === 0 ? (
-                  <Typography>Nenhum item no carrinho.</Typography>
-                ) : (
-                  <List>
-                    {cart.map((item) => (
-                      <ListItem key={item.id} secondaryAction={
-                        <>
-                          <IconButton onClick={() => alterarQuantidade(item.id, -1)}>
-                            <Remove />
-                          </IconButton>
-                          <Typography>{item.quantidade}</Typography>
-                          <IconButton onClick={() => alterarQuantidade(item.id, 1)}>
-                            <Add />
-                          </IconButton>
-                        </>
-                      }>
-                        <ListItemText
-                          primary={item.nome}
-                          secondary={`R$ ${item.valor} cada`}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
-                <Typography variant="h6" style={{ marginTop: 10 }}>
-                  Total: R$ {valorTotal.toFixed(2)}
-                </Typography>
+            <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 2, boxShadow: 3, color:"#001469"}}>
+              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection:"column", marginTop: 2 }}>
+                <Box component="img" src="delivery.png" alt="logo" sx={{ width: "8vw", height: "auto", textAlign:"center" }} />
+              </Box>
+                <DialogTitle sx={{textAlign:"center", fontWeight:"bold"}}>Resumo do Pedido</DialogTitle>
+                <DialogContent>
+                  {cart.length === 0 ? (
+                    <Typography sx={{textAlign:"center", fontSize:"1.2rem"}}>Nenhum item no carrinho.</Typography>
+                  ) : (
+                    <List>
+                      {cart.map((item) => (
+                        <ListItem key={item.id} secondaryAction={
+                          <>
+                          <Box sx={{ display: "flex", alignItems: "center", marginLeft: "-90px",borderRadius: 1, backgroundColor:"#ccc"}}>
+                              <IconButton onClick={() => setCart(cart.filter((p) => p.id !== item.id))} sx={{backgroundColor:"#fff", color:"#003399", maxHeight:"30px", maxWidth:"30px", marginRight:"5px",":hover": { backgroundColor: "#eee" }}}>
+                                <DeleteRoundedIcon />
+                              </IconButton>
+                              <IconButton onClick={() => alterarQuantidade(item.id, -1)} sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
+                                <Remove />
+                              </IconButton>
+                              <Typography sx={{marginLeft:"5px", marginRight:"5px"}}>{item.quantidade}</Typography>
+                              <IconButton onClick={() => alterarQuantidade(item.id, 1)}sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
+                                <Add />
+                              </IconButton>
+                          </Box>
+                          </>
+                        }>
+                          <ListItemText primary={item.nome} secondary={`R$ ${item.valor} cada`}/>
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                  <Typography variant="h6" style={{ marginTop: 10, textAlign:"center"}}>Deseja Finalizar essa Venda?</Typography>
+                  <Box sx={{ display: "flex",justifyContent: "center", alignItems: "center" }}>
+                    <Typography variant="h6" style={{ marginTop: 10, fontWeight:"bold" }}> Total:</Typography>
+                    <Typography variant="h6" style={{ marginTop: 10, marginLeft:"5px"}}>R$ {valorTotal.toFixed(2)}</Typography>
+                  </Box>
               </DialogContent>
               <DialogActions>
-                <Button onClick={fecharResumo}>Cancelar</Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={abrirConfirmacao}
-                  disabled={cart.length === 0}
-                >
-                  Finalizar Venda
-                </Button>
+                <Button onClick={fecharResumo} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
+                <Button variant="contained" color="primary" onClick={abrirConfirmacao} disabled={cart.length === 0}>Confirmar</Button>
               </DialogActions>
+              </Box>
             </Dialog>
 
             {/* Modal de Confirmação */}
             <Dialog open={confirmacaoAberta} onClose={fecharConfirmacao}>
-              <DialogTitle>Confirmar Venda</DialogTitle>
-              <DialogContent>
-                <Typography>
-                  Tem certeza que deseja finalizar esta venda?
-                </Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={fecharConfirmacao}>Cancelar</Button>
-                <Button variant="contained" color="success" onClick={finalizarPedido}>
-                  Confirmar
-                </Button>
-              </DialogActions>
+              <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
+                <DialogTitle sx={{fontWeight:"bold"}}>Confirmar Venda?</DialogTitle>
+                <DialogContent>
+                  <Typography> Tem certeza que deseja finalizar esta venda?</Typography>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={fecharConfirmacao} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
+                <Button variant="contained" color="primary" onClick={finalizarPedido} disabled={cart.length === 0}>Confirmar</Button>
+                </DialogActions>
+              </Box>
             </Dialog>
           </Box>
     </Box>
