@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
+import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -19,13 +19,14 @@ const produtosMock = [
 
 export default function Order() {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
   const [modoVendaAtivo, setModoVendaAtivo] = useState(true);
   const [cart, setCart] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user"));
   const [anchorEl, setAnchorEl] = useState(null);
   const [produtos] = useState(produtosMock)
+  const [pedidoSucesso, setPedidoSucesso] = useState(false);
 
 
   const handleMenuOpen = (event) => {
@@ -89,12 +90,13 @@ export default function Order() {
   const valorTotal = cart.reduce((total, item) => total + item.quantidade * item.valor, 0);
 
   const finalizarPedido = () => {
-    console.log("Pedido finalizado:", cart);
     fecharConfirmacao();
     setCart([]);
     setModoVendaAtivo(true);
+    setPedidoSucesso(true);
   };
-
+  const novaData = new Date();
+  const dataFormatada = novaData.toLocaleDateString("pt-BR");
   return (
     // Container central
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
@@ -152,16 +154,16 @@ export default function Order() {
               </Box>
                 {modoVendaAtivo && (
                   <div style={{ marginTop: 30 }}>
-                    <TableContainer sx={{  width:"55vw" }}>
+                    <TableContainer sx={{  width:"55vw", borderRadius: 2 }}>
                         <Table>
                           <TableHead sx={{color:"#ccc"}}>
                             <TableRow sx={{backgroundImage: "linear-gradient(45deg, #2EAAE9,#0C2051)", color:"#ccc"}}>
                               <TableCell sx={{color:"#ccc",textTransform:"capitalize"
-                              }}>Produto</TableCell>
+                              }}>Nome</TableCell>
                               <TableCell sx={{color:"#ccc",textTransform:"capitalize"
-                              }} align="center">Preço</TableCell>
+                              }} align="center">Valor</TableCell>
                               <TableCell sx={{color:"#ccc",textTransform:"capitalize"
-                              }}align="center">Ações</TableCell>
+                              }}align="center">Adicionar Item</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -193,7 +195,7 @@ export default function Order() {
                 <DialogTitle sx={{textAlign:"center", fontWeight:"bold"}}>Resumo do Pedido</DialogTitle>
                 <DialogContent>
                   {cart.length === 0 ? (
-                    <Typography sx={{textAlign:"center", fontSize:"1.2rem"}}>Nenhum item no carrinho.</Typography>
+                    <DialogContentText sx={{textAlign:"center", fontSize:"1.2rem"}}>Nenhum item no carrinho.</DialogContentText>
                   ) : (
                     <List>
                       {cart.map((item) => (
@@ -234,16 +236,33 @@ export default function Order() {
             {/* Modal de Confirmação */}
             <Dialog open={confirmacaoAberta} onClose={fecharConfirmacao}>
               <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
-                <DialogTitle sx={{fontWeight:"bold"}}>Confirmar Venda?</DialogTitle>
+                <DialogTitle sx={{fontWeight:"bold"}}>Confirmação</DialogTitle>
                 <DialogContent>
-                  <Typography> Tem certeza que deseja finalizar esta venda?</Typography>
+                  <DialogContentText> Tem certeza que deseja finalizar esta venda?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={fecharConfirmacao} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
-                <Button variant="contained" color="primary" onClick={finalizarPedido} disabled={cart.length === 0}>Confirmar</Button>
+                <Button onClick={fecharConfirmacao} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Não</Button>
+                <Button variant="contained" color="primary" onClick={finalizarPedido} disabled={cart.length === 0}>Sim</Button>
                 </DialogActions>
               </Box>
             </Dialog>
+              
+              {/* Modal de Sucesso */}
+              <Dialog open={pedidoSucesso} onClose={() => setPedidoSucesso(false)}>
+                <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
+                    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection:"column", marginTop: 2 }}>
+                       <Box component="img" src="checklist.png" alt="logo" sx={{ width: "8vw", height: "auto", textAlign:"center" }} />
+                    </Box>
+                  <DialogTitle>Venda Realizada com Sucesso!</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>Vendedor: {user.descricao}</DialogContentText>
+                    <DialogContentText>Venda Realizada: {dataFormatada}</DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button variant="contained" autoFocus color="primary" onClick={() => setPedidoSucesso(false)}>Ok</Button>
+                  </DialogActions>
+                </Box>
+              </Dialog>
           </Box>
     </Box>
   );
