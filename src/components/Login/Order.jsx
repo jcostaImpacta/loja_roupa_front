@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow} from "@mui/material";
+import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
+import Pagination from '@mui/material/Pagination';
 import Menu from '@mui/material/Menu';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
@@ -15,6 +18,22 @@ const produtosMock = [
   { id: 2, nome: "Produto B", valor: 89.9 },
   { id: 3, nome: "Produto C", valor: 129.9 },
   { id: 4, nome: "Produto D", valor: 59.9 },
+  { id: 5, nome: "Produto E", valor: 45.9 },
+  { id: 6, nome: "Produto F", valor: 99.9 },
+  { id: 7, nome: "Produto G", valor: 79.9 },
+  { id: 8, nome: "Produto H", valor: 39.9 },
+  { id: 9, nome: "Produto I", valor: 49.9 },
+  { id: 10, nome: "Produto J", valor: 69.9 },
+  { id: 11, nome: "Produto K", valor: 89.9 },
+  { id: 12, nome: "Produto L", valor: 109.9 },
+  { id: 13, nome: "Produto M", valor: 129.9 },
+  { id: 14, nome: "Produto N", valor: 149.9 },
+  { id: 15, nome: "Produto O", valor: 169.9 },
+  { id: 16, nome: "Produto P", valor: 189.9 },
+  { id: 17, nome: "Produto Q", valor: 199.9 },
+  { id: 18, nome: "Produto R", valor: 219.9 },
+  { id: 19, nome: "Produto S", valor: 239.9 },
+  { id: 20, nome: "Produto T", valor: 259.9 },
 ];
 
 export default function Order() {
@@ -27,7 +46,13 @@ export default function Order() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [produtos] = useState(produtosMock)
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
-
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10
+  
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -97,6 +122,11 @@ export default function Order() {
   };
   const novaData = new Date();
   const dataFormatada = novaData.toLocaleDateString("pt-BR");
+
+  const produtosFiltrados = produtos.filter(produto =>
+    produto.nome.toLowerCase().includes(search.toLowerCase())
+  );
+  
   return (
     // Container central
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
@@ -129,9 +159,19 @@ export default function Order() {
             </Drawer>
 
       <Box sx={{ display:"flex",width:"90vw",flexGrow: 1, p: 3, backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
-
+      
         <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
+        
           <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "self-start", marginRight:"38vw", position:"absolute", width:"20vw"}}>
+            <TextField variant="outlined" placeholder="Buscar..." sx={{width: "25vw",backgroundColor: "#eee",borderRadius: "8px",boxShadow: 3,"&:hover": { backgroundColor: "none", border: "#001469" }}} value={search} onChange={handleSearchChange} 
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon sx={{ color: "#001469" }}/>
+                </InputAdornment>
+              ),}}/>
+          </Box>
           <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
             <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{borderRadius:"100%", "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
               <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"30px", maxWidth:"30px" }} />
@@ -167,7 +207,7 @@ export default function Order() {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {produtos.map((produto) => (
+                            {produtosFiltrados.slice((page - 1) * itemsPerPage, page * itemsPerPage).map((produto) =>  (
                               <TableRow key={produto.id}>
                                 <TableCell>{produto.nome}</TableCell>
                                 <TableCell align="center">R$ {produto.valor.toFixed(2)}</TableCell>
@@ -185,6 +225,12 @@ export default function Order() {
                   </div>
                 )}
               </Box>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+                    <Pagination count={Math.ceil(produtosMock.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{
+                            "& .MuiPaginationItem-root": { color: "#001469" },
+                            "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }
+                          }} />
+                </Box>
         </Box>
             {/* Modal de Resumo */}
             <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
