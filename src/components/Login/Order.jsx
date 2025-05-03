@@ -14,28 +14,27 @@ import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
 
 const produtosMock = [
-  { id: 1, nome: "Produto A", valor: 35.9 },
-  { id: 2, nome: "Produto B", valor: 89.9 },
-  { id: 3, nome: "Produto C", valor: 129.9 },
-  { id: 4, nome: "Produto D", valor: 59.9 },
-  { id: 5, nome: "Produto E", valor: 45.9 },
-  { id: 6, nome: "Produto F", valor: 99.9 },
-  { id: 7, nome: "Produto G", valor: 79.9 },
-  { id: 8, nome: "Produto H", valor: 39.9 },
-  { id: 9, nome: "Produto I", valor: 49.9 },
-  { id: 10, nome: "Produto J", valor: 69.9 },
-  { id: 11, nome: "Produto K", valor: 89.9 },
-  { id: 12, nome: "Produto L", valor: 109.9 },
-  { id: 13, nome: "Produto M", valor: 129.9 },
-  { id: 14, nome: "Produto N", valor: 149.9 },
-  { id: 15, nome: "Produto O", valor: 169.9 },
-  { id: 16, nome: "Produto P", valor: 189.9 },
-  { id: 17, nome: "Produto Q", valor: 199.9 },
-  { id: 18, nome: "Produto R", valor: 219.9 },
-  { id: 19, nome: "Produto S", valor: 239.9 },
-  { id: 20, nome: "Produto T", valor: 259.9 },
+  { id: 1, nome: "Camisa Básica Branca", valor: 39.9 },
+  { id: 2, nome: "Camisa Social Azul", valor: 89.9 },
+  { id: 3, nome: "Calça Jeans Skinny", valor: 129.9 },
+  { id: 4, nome: "Shorts Praia Floral", valor: 59.9 },
+  { id: 5, nome: "Tênis Esportivo Preto", valor: 199.9 },
+  { id: 6, nome: "Sapato Social Marrom", valor: 249.9 },
+  { id: 7, nome: "Sandália Rasteira", valor: 79.9 },
+  { id: 8, nome: "Vestido Floral Curto", valor: 149.9 },
+  { id: 9, nome: "Body Bebê Algodão", valor: 49.9 },
+  { id: 10, nome: "Biquini Listrado", valor: 99.9 },
+  { id: 11, nome: "Sunga Estampada", valor: 69.9 },
+  { id: 12, nome: "Óculos de Sol Aviador", valor: 149.9 },
+  { id: 13, nome: "Camiseta Infantil Estampada", valor: 34.9 },
+  { id: 14, nome: "Camisa Polo Verde", valor: 79.9 },
+  { id: 15, nome: "Calça Moletom Cinza", valor: 119.9 },
+  { id: 16, nome: "Shorts Jeans Destroyed", valor: 89.9 },
+  { id: 17, nome: "Tênis Casual Branco", valor: 179.9 },
+  { id: 18, nome: "Sapato Feminino Salto", valor: 259.9 },
+  { id: 19, nome: "Vestido Longo Elegante", valor: 199.9 },
+  { id: 20, nome: "Óculos de Grau Moderno", valor: 189.9 },
 ];
-
 export default function Order() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -66,7 +65,6 @@ export default function Order() {
     setAnchorEl(null);
     navigate("/");
   };
-  // const iniciarVenda = () => setModoVendaAtivo(true);
 
   const abrirResumo = () => setResumoAberto(true);
   const fecharResumo = () => setResumoAberto(false);
@@ -128,9 +126,7 @@ export default function Order() {
   );
   
   return (
-    // Container central
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
-      {/* Sidebar esquerda */}
       <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
               <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
                 <Typography variant="h6">
@@ -156,7 +152,7 @@ export default function Order() {
                   <ExitToAppIcon/> Sair
                 </Button>
               </AppBar>
-            </Drawer>
+      </Drawer>
 
       <Box sx={{ display:"flex",width:"90vw",flexGrow: 1, p: 3, backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
       
@@ -178,16 +174,16 @@ export default function Order() {
             </Badge>
           </IconButton>
 
-          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "none", boxShadow: "none","&:hover": { backgroundColor: "none", boxShadow: "none" },}}>
-              <AccountCircle sx={{maxHeight:"34px", maxWidth:"34px", color: "#001469", marginRight:"1vw",backgroundColor: "none", "&:hover": { backgroundColor: "none" }}}/>
-              <Typography sx={{ color: "#001469", fontWeight: "bold", paddingRight:"1vw" }}>{user.descricao}</Typography>
-            </Button>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
-              <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
-            </Menu>
+          <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
+            <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
+            <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
+          </Button>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} transformOrigin={{vertical: 'top', horizontal: 'right',}}>
+            <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
+          </Menu>
           </Box>
               
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "initial", marginTop: 2, backgroundColor: "#eee", padding: 2, borderRadius: 2, boxShadow: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "initial", marginTop: 2, backgroundColor: "#fff", padding: 2, borderRadius: 2, boxShadow: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", flexDirection:"row",  marginTop: 2 }}>
                 <ShoppingBagRoundedIcon sx={{display:"flex",height: "30px", width:"30px", marginRight:"8px"}}/>
                 <Typography variant="h5" sx={{color:"#001469", fontWeight:"bold", textAlign:"initial" }}>Área de Vendas</Typography>
@@ -212,7 +208,7 @@ export default function Order() {
                                 <TableCell>{produto.nome}</TableCell>
                                 <TableCell align="center">R$ {produto.valor.toFixed(2)}</TableCell>
                                 <TableCell align="center">
-                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#003399", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#001469" }}}>Adicionar</Button>
+                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#003399" }}}>Adicionar</Button>
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -224,17 +220,13 @@ export default function Order() {
                       </Box>
                   </div>
                 )}
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-                    <Pagination count={Math.ceil(produtosMock.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{
-                            "& .MuiPaginationItem-root": { color: "#001469" },
-                            "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }
-                          }} />
-                </Box>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Pagination count={Math.ceil(produtosMock.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
+          </Box>
         </Box>
-            {/* Modal de Resumo */}
-            <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
-            <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 2, boxShadow: 3, color:"#001469"}}>
+        <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
+          <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 2, boxShadow: 3, color:"#001469"}}>
               <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection:"column", marginTop: 2 }}>
                 <Box component="img" src="delivery.png" alt="logo" sx={{ width: "8vw", height: "auto", textAlign:"center" }} />
               </Box>
@@ -276,10 +268,8 @@ export default function Order() {
                 <Button onClick={fecharResumo} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
                 <Button variant="contained" color="primary" onClick={abrirConfirmacao} disabled={cart.length === 0}>Confirmar</Button>
               </DialogActions>
-              </Box>
-            </Dialog>
-
-            {/* Modal de Confirmação */}
+          </Box>
+        </Dialog>
             <Dialog open={confirmacaoAberta} onClose={fecharConfirmacao}>
               <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
                 <DialogTitle sx={{fontWeight:"bold"}}>Confirmação</DialogTitle>
@@ -292,9 +282,8 @@ export default function Order() {
                 </DialogActions>
               </Box>
             </Dialog>
-              
-              {/* Modal de Sucesso */}
-              <Dialog open={pedidoSucesso} onClose={() => setPedidoSucesso(false)}>
+
+            <Dialog open={pedidoSucesso} onClose={() => setPedidoSucesso(false)}>
                 <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection:"column", marginTop: 2 }}>
                        <Box component="img" src="checklist.png" alt="logo" sx={{ width: "8vw", height: "auto", textAlign:"center" }} />
@@ -308,7 +297,7 @@ export default function Order() {
                     <Button variant="contained" autoFocus color="primary" onClick={() => setPedidoSucesso(false)}>Ok</Button>
                   </DialogActions>
                 </Box>
-              </Dialog>
+            </Dialog>
           </Box>
     </Box>
   );
