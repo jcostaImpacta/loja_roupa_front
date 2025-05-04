@@ -92,19 +92,6 @@ export default function Order() {
   };
   const fetchOrder = async () => {
     navigate("/new_order");
-    // try {
-    //   const response = await fetch("/api/new_order", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     },
-    //   });
-    //   const orderData = await response.json();
-    //   localStorage.setItem("order", JSON.stringify(orderData));
-    //   navigate("/new_order");
-    // } catch (error) {
-    //   console.error("Erro ao iniciar nova venda:", error);
-    // }
   };
   const alterarQuantidade = (id, delta) => {
     setCart((prev) =>
