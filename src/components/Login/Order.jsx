@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
@@ -13,41 +13,45 @@ import Menu from '@mui/material/Menu';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
 
-const produtosMock = [
-  { id: 1, nome: "Camisa Básica Branca", valor: 39.9 },
-  { id: 2, nome: "Camisa Social Azul", valor: 89.9 },
-  { id: 3, nome: "Calça Jeans Skinny", valor: 129.9 },
-  { id: 4, nome: "Shorts Praia Floral", valor: 59.9 },
-  { id: 5, nome: "Tênis Esportivo Preto", valor: 199.9 },
-  { id: 6, nome: "Sapato Social Marrom", valor: 249.9 },
-  { id: 7, nome: "Sandália Rasteira", valor: 79.9 },
-  { id: 8, nome: "Vestido Floral Curto", valor: 149.9 },
-  { id: 9, nome: "Body Bebê Algodão", valor: 49.9 },
-  { id: 10, nome: "Biquini Listrado", valor: 99.9 },
-  { id: 11, nome: "Sunga Estampada", valor: 69.9 },
-  { id: 12, nome: "Óculos de Sol Aviador", valor: 149.9 },
-  { id: 13, nome: "Camiseta Infantil Estampada", valor: 34.9 },
-  { id: 14, nome: "Camisa Polo Verde", valor: 79.9 },
-  { id: 15, nome: "Calça Moletom Cinza", valor: 119.9 },
-  { id: 16, nome: "Shorts Jeans Destroyed", valor: 89.9 },
-  { id: 17, nome: "Tênis Casual Branco", valor: 179.9 },
-  { id: 18, nome: "Sapato Feminino Salto", valor: 259.9 },
-  { id: 19, nome: "Vestido Longo Elegante", valor: 199.9 },
-  { id: 20, nome: "Óculos de Grau Moderno", valor: 189.9 },
-];
+
 export default function Order() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const [modoVendaAtivo, setModoVendaAtivo] = useState(true);
   const [cart, setCart] = useState([]);
+  const [orderResult, setOrderResult] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [produtos] = useState(produtosMock)
+  const [produtos, setProdutos] = useState([]);
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
   const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
+    setLoading(true);
+    fetch("/api/get_products/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(filters),
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Erro na API: ${res.status}`);
+      }
+      return res.json();
+    }).then((produtosData) => {
+      setProdutos(produtosData);
+    })
+      .catch((error) => console.error("Erro nas requisições:", error))
+      .finally(() => setLoading(false));
+  };
   
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -75,54 +79,74 @@ export default function Order() {
   };
   const fecharConfirmacao = () => setConfirmacaoAberta(false);
   const adicionarProduto = (produto) => {
-    const existente = cart.find((p) => p.id === produto.id);
+    const existente = cart.includes((p) => p.id === produto.id);
     if (existente) {
       setCart((prev) =>
         prev.map((p) =>
-          p.id === produto.id ? { ...p, quantidade: p.quantidade + 1 } : p
+          p.id === produto.id ? { ...p, qtd_total: p.qtd_total + 1 } : p
         )
       );
     } else {
-      setCart([...cart, { ...produto, quantidade: 1 }]);
+      setCart([...cart, { ...produto, qtd_total: 1 }]);
     }
   };
   const fetchOrder = async () => {
-    try {
-      const response = await fetch("/api/new_order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
-      const orderData = await response.json();
-      localStorage.setItem("order", JSON.stringify(orderData));
-      navigate("/new_order");
-    } catch (error) {
-      console.error("Erro ao iniciar nova venda:", error);
-    }
+    navigate("/new_order");
+    // try {
+    //   const response = await fetch("/api/new_order", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     },
+    //   });
+    //   const orderData = await response.json();
+    //   localStorage.setItem("order", JSON.stringify(orderData));
+    //   navigate("/new_order");
+    // } catch (error) {
+    //   console.error("Erro ao iniciar nova venda:", error);
+    // }
   };
   const alterarQuantidade = (id, delta) => {
     setCart((prev) =>
       prev
         .map((p) =>
-          p.id === id ? { ...p, quantidade: Math.max(1, p.quantidade + delta) } : p
+          p.id === id ? { ...p, qtd_total: Math.max(1, p.qtd_total + delta) } : p
         )
     );
   };
 
-  const valorTotal = cart.reduce((total, item) => total + item.quantidade * item.valor, 0);
+  const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
+
+  const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
 
   const finalizarPedido = () => {
     fecharConfirmacao();
-    setCart([]);
-    setModoVendaAtivo(true);
-    setPedidoSucesso(true);
+
+    let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal}
+
+    fetch("/api/new_order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Erro na API: ${res.status}`);
+        }
+        return res.json();
+      }).then((orderResult) => {
+        setCart([]);
+        setModoVendaAtivo(true);
+        setPedidoSucesso(true);
+        setOrderResult(orderResult);
+      })
+        .catch((error) => console.error("Erro nas requisições:", error))
+        .finally(() => setLoading(false));
   };
-  const novaData = new Date();
-  const dataFormatada = novaData.toLocaleDateString("pt-BR");
+
+  const dataFormatada = new Date(orderResult.dt_ordem).toLocaleString("pt-BR").slice(0, 17);
 
   const produtosFiltrados = produtos.filter(produto =>
-    produto.nome.toLowerCase().includes(search.toLowerCase())
+    produto.dc_produto.toLowerCase().includes(search.toLowerCase())
   );
   
   return (
@@ -169,7 +193,7 @@ export default function Order() {
               ),}}/>
           </Box>
           <IconButton onClick={abrirResumo} edge="end" color="inherit"sx={{backgroundColor: "transparent", fontWeight:"bold", textTransform:"capitalize",boxShadow: "none",width:"4vw", marginRight:"1vw","&:hover": { backgroundColor: "none", boxShadow: "none" }}}>
-            <Badge badgeContent={cart.reduce((sum, item) => sum + item.quantidade, 0)} color="primary" sx={{borderRadius:"100%", "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
+            <Badge badgeContent={quantidadeTotal} color="primary" sx={{borderRadius:"100%", "& .MuiBadge-dot": { backgroundColor: "#001469" } }}>
               <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"30px", maxWidth:"30px" }} />
             </Badge>
           </IconButton>
@@ -205,8 +229,8 @@ export default function Order() {
                           <TableBody>
                             {produtosFiltrados.slice((page - 1) * itemsPerPage, page * itemsPerPage).map((produto) =>  (
                               <TableRow key={produto.id}>
-                                <TableCell>{produto.nome}</TableCell>
-                                <TableCell align="center">R$ {produto.valor.toFixed(2)}</TableCell>
+                                <TableCell>{produto.dc_produto}</TableCell>
+                                <TableCell align="center">R$ {produto.vl_produto.toFixed(2)}</TableCell>
                                 <TableCell align="center">
                                   <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#003399" }}}>Adicionar</Button>
                                 </TableCell>
@@ -222,7 +246,7 @@ export default function Order() {
                 )}
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <Pagination count={Math.ceil(produtosMock.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
+            <Pagination count={Math.ceil(produtos?.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
           </Box>
         </Box>
         <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
@@ -246,14 +270,14 @@ export default function Order() {
                               <IconButton onClick={() => alterarQuantidade(item.id, -1)} sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
                                 <Remove />
                               </IconButton>
-                              <Typography sx={{marginLeft:"5px", marginRight:"5px"}}>{item.quantidade}</Typography>
+                              <Typography sx={{marginLeft:"5px", marginRight:"5px"}}>{item.qtd_total}</Typography>
                               <IconButton onClick={() => alterarQuantidade(item.id, 1)}sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
                                 <Add />
                               </IconButton>
                           </Box>
                           </>
                         }>
-                          <ListItemText primary={item.nome} secondary={`R$ ${item.valor} cada`}/>
+                          <ListItemText primary={item.dc_produto} secondary={`R$ ${item.vl_produto} cada`}/>
                         </ListItem>
                       ))}
                     </List>
