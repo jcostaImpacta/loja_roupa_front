@@ -191,8 +191,8 @@ const ProductGrid = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap", mb: 2 }}>
             <FormControl sx={{ minWidth: "10vw" }}>
               <InputLabel>Categoria</InputLabel>
-              <Select name="categoria" value={filters.categoria || ""} onChange={handleFilterChange} label="Categoria">
-                <MenuItem value="">Todas</MenuItem>
+              <Select name="categoria" value={filters.categoria} onChange={handleFilterChange} label="Categoria">
+                <MenuItem >Todas</MenuItem>
                 {categorias.map((categoria) => (
                   <MenuItem key={categoria.dc_categoria} value={categoria.id_categoria}> {categoria.dc_categoria}</MenuItem>
                 ))}
@@ -201,8 +201,8 @@ const ProductGrid = () => {
 
             <FormControl sx={{ minWidth: "10vw" }}>
               <InputLabel>Gênero</InputLabel>
-              <Select name="genero" value={filters.genero || ""} onChange={handleFilterChange} label="Gênero">
-                <MenuItem value="">Todos</MenuItem>
+              <Select name="genero" value={filters.genero} onChange={handleFilterChange} label="Gênero">
+                <MenuItem >Todos</MenuItem>
                 {generos.map((genero) => (
                   <MenuItem key={genero.dc_genero} value={genero.id_genero}> {genero.dc_genero}</MenuItem>
                 ))}
@@ -211,8 +211,8 @@ const ProductGrid = () => {
 
             <FormControl sx={{ minWidth: "10vw" }}>
               <InputLabel>Público</InputLabel>
-              <Select name="publico" value={filters.publico || ""} onChange={handleFilterChange} label="Público">
-                <MenuItem value="">Todos</MenuItem>
+              <Select name="publico" value={filters.publico} onChange={handleFilterChange} label="Público">
+                <MenuItem >Todos</MenuItem>
                 {publicos.map((publico) => (
                   <MenuItem key={publico.dc_publico} value={publico.id_publico}> {publico.dc_publico}</MenuItem>
                 ))}
@@ -221,8 +221,8 @@ const ProductGrid = () => {
 
             <FormControl sx={{ minWidth: "10vw" }}>
               <InputLabel>Coleção</InputLabel>
-              <Select name="colecao" value={filters.colecao || ""} onChange={handleFilterChange} label="Coleção">
-                <MenuItem value="">Todas</MenuItem>
+              <Select name="colecao" value={filters.colecao} onChange={handleFilterChange} label="Coleção">
+                <MenuItem >Todas</MenuItem>
                 {colecoes.map((colecao) => (
                   <MenuItem key={colecao.dc_colecao} value={colecao.id_colecao}> {colecao.dc_colecao}</MenuItem>
                 ))}
