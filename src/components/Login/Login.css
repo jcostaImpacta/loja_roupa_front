@@ -1,9 +1,10 @@
 body {
   background: linear-gradient(45deg, #2EAAE9, #1A6083);
-  height: 100vh; /* Certifique-se de que o fundo cubra a tela inteira */
-  margin: 0; /* Remova a margem padrão do body */
+  max-height: 100vh;
+  margin: 0; 
   display: flex;
   justify-content: center;
+  background-size: cover;
   align-items: center;
 }
 .container {
