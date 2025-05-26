@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import Pagination from '@mui/material/Pagination';
 import Menu from '@mui/material/Menu';
+// import Tooltip  from '@mui/material';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
 
@@ -22,12 +23,12 @@ export default function Order() {
   const [orderResult, setOrderResult] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
-  const [setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [produtos, setProdutos] = useState([]);
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
   const [search, setSearch] = useState("");
-  const [filters] = useState({});
+  const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10
 
@@ -105,6 +106,14 @@ export default function Order() {
   const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
 
   const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
+
+  const isAdicionarDesabilitado = (produto) => {
+  const itemNoCarrinho = cart.find((item) => item.id === produto.id);
+  const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
+
+  return produto.qtd_estoque <= quantidadeNoCarrinho;
+};
+
 
   const finalizarPedido = () => {
     fecharConfirmacao();
@@ -219,7 +228,30 @@ export default function Order() {
                                 <TableCell>{produto.dc_produto}</TableCell>
                                 <TableCell align="center">R$ {produto.vl_produto.toFixed(2)}</TableCell>
                                 <TableCell align="center">
-                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#003399" }}}>Adicionar</Button>
+                                  {/* <Tooltip title={isAdicionarDesabilitado(produto) ? "Produto sem estoque disponível" : ""}> */}
+                                  <span>
+                                    <Button
+                                    onClick={() => adicionarProduto(produto)}
+                                     sx={{
+                                      backgroundColor: "#001469",
+                                      color: "#ccc",
+                                      fontWeight: "bold",
+                                      textTransform: "capitalize",
+                                      maxWidth: "150px",
+                                      ":hover": {
+                                        backgroundColor: "#003399"
+                                      },
+                                      ...(isAdicionarDesabilitado(produto) && {
+                                        backgroundColor: "#ccc",
+                                        color: "#666",
+                                        cursor: "not-allowed"
+                                      })
+                                    }}
+                                    >
+                                      Adicionar
+                                    </Button>
+                                  </span>
+                                  {/* </Tooltip> */}
                                 </TableCell>
                               </TableRow>
                             ))}
