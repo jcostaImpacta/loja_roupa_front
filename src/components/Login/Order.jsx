@@ -22,12 +22,12 @@ export default function Order() {
   const [orderResult, setOrderResult] = useState([]);
   const [resumoAberto, setResumoAberto] = useState(false);
   const [confirmacaoAberta, setConfirmacaoAberta] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [produtos, setProdutos] = useState([]);
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({});
+  const [filters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10
 
