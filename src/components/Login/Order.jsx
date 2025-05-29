@@ -13,29 +13,6 @@ import Menu from '@mui/material/Menu';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
 
-const produtosMock = [
-  { id: 1, nome: "Camisa Básica Branca", valor: 39.9, qtd_estoque:  50},
-  { id: 2, nome: "Camisa Social Azul", valor: 89.9, qtd_estoque:  30},
-  { id: 3, nome: "Calça Jeans Skinny", valor: 129.9, qtd_estoque:  25},
-  { id: 4, nome: "Shorts Praia Floral", valor: 59.9, qtd_estoque:  40},
-  { id: 5, nome: "Tênis Esportivo Preto", valor: 199.9, qtd_estoque:  20},
-  { id: 6, nome: "Sapato Social Marrom", valor: 249.9, qtd_estoque:  15},
-  { id: 7, nome: "Sandália Rasteira", valor: 79.9, qtd_estoque:  35},
-  { id: 8, nome: "Vestido Floral Curto", valor: 149.9, qtd_estoque:  18},
-  { id: 9, nome: "Body Bebê Algodão", valor: 49.9, qtd_estoque:  50},
-  { id: 10, nome: "Biquini Listrado", valor: 99.9, qtd_estoque:  22},
-  { id: 11, nome: "Sunga Estampada", valor: 69.9, qtd_estoque:  30},
-  { id: 12, nome: "Óculos de Sol Aviador", valor: 149.9, qtd_estoque:  10},
-  { id: 13, nome: "Camiseta Infantil Estampada", valor: 34.9, qtd_estoque: 40 },
-  { id: 14, nome: "Camisa Polo Verde", valor: 79.9, qtd_estoque:  28},
-  { id: 15, nome: "Calça Moletom Cinza", valor: 119.9, qtd_estoque: 20 },
-  { id: 16, nome: "Shorts Jeans Destroyed", valor: 89.9, qtd_estoque: 15 },
-  { id: 17, nome: "Tênis Casual Branco", valor: 179.9, qtd_estoque:  25},
-  { id: 18, nome: "Sapato Feminino Salto", valor: 259.9, qtd_estoque:  10},
-  { id: 19, nome: "Vestido Longo Elegante", valor: 199.9, qtd_estoque:  12},
-  { id: 20, nome: "Óculos de Grau Moderno", valor: 189.9, qtd_estoque:8},
-];
-
 export default function Order() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -49,31 +26,30 @@ export default function Order() {
   const [produtos, setProdutos] = useState([]);
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({});
+  const [filters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10
 
   useEffect(() => {
     fetchData();
-    setProdutos(produtosMock);
   }, []);
 
   const fetchData = () => {
     setLoading(true);
-  //   fetch("/api/get_products/", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(filters),
-  //   }).then((res) => {
-  //     if (!res.ok) {
-  //       throw new Error(`Erro na API: ${res.status}`);
-  //     }
-  //     return res.json();
-  //   }).then((produtosData) => {
-  //     setProdutos(produtosData);
-  //   })
-  //     .catch((error) => console.error("Erro nas requisições:", error))
-  //     .finally(() => setLoading(false));
+    fetch("/api/get_products/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(filters),
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Erro na API: ${res.status}`);
+      }
+      return res.json();
+    }).then((produtosData) => {
+      setProdutos(produtosData);
+    })
+      .catch((error) => console.error("Erro nas requisições:", error))
+      .finally(() => setLoading(false));
   };
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -96,47 +72,55 @@ export default function Order() {
   };
   const fecharConfirmacao = () => setConfirmacaoAberta(false);
   const adicionarProduto = (produto) => {
-    const existente = cart.find((p) => p.id === produto.id);
-    const quantidadeNoCarrinho = existente ? existente.qtd_total : 0;
-      if (quantidadeNoCarrinho >= produto.qtd_estoque) {
-        return;
-      }
-      if (existente) {
-        setCart((prev) =>
-          prev.map((p) =>
-            p.id === produto.id ? { ...p, qtd_total: p.qtd_total + 1 } : p
-          )
-        );
-      } else {
-        setCart([...cart, { ...produto, qtd_total: 1 }]);
-      }
-    };
+  const produtoExistente = cart.find((p) => p.id_produto === produto.id_produto);
+  const quantidadeNoCarrinho = produtoExistente ? produtoExistente.qtd_total : 0;
+
+  if (quantidadeNoCarrinho >= produto.qtd_total) {
+    return;
+  }
+
+  if (produtoExistente) {
+    setCart((prev) =>
+      prev.map((p) =>
+        p.id_produto === produto.id_produto
+          ? { ...p, qtd_total: p.qtd_total + 1 }
+          : p
+      )
+    );
+  } else {
+    setCart([...cart, { ...produto, qtd_total: 1 }]);
+  }
+};
+
   const fetchOrder = async () => {
     navigate("/new_order");
   };
+
   const alterarQuantidade = (id, delta) => {
       setCart((prev) =>
         prev.map((p) => {
-          if (p.id === id) {
+          if (p.id_produto_ === id) {
             const novaQuantidade = p.qtd_total + delta;
             if (novaQuantidade < 1) return { ...p, qtd_total: 1 }; 
-            if (novaQuantidade > p.qtd_estoque) return p; 
+            if (novaQuantidade > p.qtd_total) return p; 
             return { ...p, qtd_total: novaQuantidade };
           }
           return p;
         })
       );
     };
-  const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.valor, 0);
+
+  const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
   const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
   const isAdicionarDesabilitado = (produto) => {
     const itemNoCarrinho = cart.find((item) => item.id === produto.id);
     const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
-    return produto.qtd_estoque <= quantidadeNoCarrinho;
+    return produto.qtd_total <= quantidadeNoCarrinho;
     };
   const finalizarPedido = () => {
     fecharConfirmacao();
-    let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal}
+    let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal, "lista_produtos": cart}
+
     fetch("/api/new_order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -155,9 +139,17 @@ export default function Order() {
         .catch((error) => console.error("Erro nas requisições:", error))
         .finally(() => setLoading(false));
   };
+  const fetchReturn = () => {
+    fetchData();
+    setModoVendaAtivo(false);
+    setResumoAberto(false);
+    setPedidoSucesso(false);
+    setCart([]);
+    navigate("/products");
+  }
   const dataFormatada = orderResult?.dt_ordem ? new Date(orderResult.dt_ordem).toLocaleString("pt-BR").slice(0, 17) : "";
   const produtosFiltrados = produtos.filter(produto =>
-    produto.nome.toLowerCase().includes(search.toLowerCase())
+    produto.dc_produto.toLowerCase().includes(search.toLowerCase())
   );
   return (
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
@@ -230,8 +222,8 @@ export default function Order() {
                           <TableBody>
                             {produtosFiltrados.slice((page - 1) * itemsPerPage, page * itemsPerPage).map((produto) =>  (
                               <TableRow key={produto.id}>
-                                <TableCell>{produto.nome}</TableCell>
-                                <TableCell align="center">R$ {produto.valor.toFixed(2)}</TableCell>
+                                <TableCell>{produto.dc_produto}</TableCell>
+                                <TableCell align="center">R$ {produto.vl_produto.toFixed(2)}</TableCell>
                                 <TableCell align="center">
                                     <Button
                                     onClick={() => adicionarProduto(produto)}
@@ -268,7 +260,7 @@ export default function Order() {
                 )}
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <Pagination count={Math.ceil(produtosMock.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
+            <Pagination count={Math.ceil(produtos.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
           </Box>
         </Box>
         <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
@@ -314,7 +306,7 @@ export default function Order() {
                           </Box>
                           </>
                         }>
-                          <ListItemText primary={item.nome} secondary={`R$ ${item.valor} cada`}/>
+                          <ListItemText primary={item.dc_produto} secondary={`R$ ${item.vl_produto} cada`}/>
                         </ListItem>
                       ))}
                     </List>
@@ -354,7 +346,7 @@ export default function Order() {
                     <DialogContentText>Venda Realizada: {dataFormatada}</DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button variant="contained" autoFocus color="primary" onClick={() => setPedidoSucesso(false)}>Ok</Button>
+                    <Button variant="contained" autoFocus color="primary" onClick={() => fetchReturn()}>Ok</Button>
                   </DialogActions>
                 </Box>
             </Dialog>
