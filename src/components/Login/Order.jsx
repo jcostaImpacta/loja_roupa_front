@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
+import {Add, AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Remove, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -72,55 +71,54 @@ export default function Order() {
   };
   const fecharConfirmacao = () => setConfirmacaoAberta(false);
   const adicionarProduto = (produto) => {
-  const produtoExistente = cart.find((p) => p.id_produto === produto.id_produto);
-  const quantidadeNoCarrinho = produtoExistente ? produtoExistente.qtd_total : 0;
+    setCart((prevCart) => {
+      const produtoExistente = prevCart.find((p) => p.id_produto === produto.id_produto);
+      const quantidadeNoCarrinho = produtoExistente ? produtoExistente.qtd_total : 0;
 
-  if (quantidadeNoCarrinho >= produto.qtd_total) {
-    return;
-  }
-
-  if (produtoExistente) {
-    setCart((prev) =>
-      prev.map((p) =>
-        p.id_produto === produto.id_produto
-          ? { ...p, qtd_total: p.qtd_total + 1 }
-          : p
-      )
-    );
-  } else {
-    setCart([...cart, { ...produto, qtd_total: 1 }]);
-  }
-};
-
+      if (quantidadeNoCarrinho >= produto.qtd_total) {
+        return prevCart;
+      }
+      if (produtoExistente) {
+        return prevCart.map((p) =>
+          p.id_produto === produto.id_produto
+            ? { ...p, qtd_total: p.qtd_total + 1 }
+            : p
+        );
+      } else {
+        return [...prevCart, { ...produto, qtd_total: 1 }];
+      }
+    });
+  };
   const fetchOrder = async () => {
     navigate("/new_order");
   };
-
   const alterarQuantidade = (id, delta) => {
-      setCart((prev) =>
-        prev.map((p) => {
-          if (p.id_produto_ === id) {
-            const novaQuantidade = p.qtd_total + delta;
-            if (novaQuantidade < 1) return { ...p, qtd_total: 1 }; 
-            if (novaQuantidade > p.qtd_total) return p; 
-            return { ...p, qtd_total: novaQuantidade };
-          }
-          return p;
-        })
-      );
-    };
-
-  const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
-  const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
-  const isAdicionarDesabilitado = (produto) => {
-    const itemNoCarrinho = cart.find((item) => item.id === produto.id);
-    const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
-    return produto.qtd_total <= quantidadeNoCarrinho;
-    };
+  setCart((prev) =>
+    prev.map((p) => {
+      if (p.id_produto === id) {
+        const novaQuantidade = p.qtd_total + delta;
+        if (novaQuantidade < 1) {
+          return { ...p, qtd_total: 1 };
+        }
+        if (novaQuantidade > p.estoque) {
+          return { ...p, qtd_total: p.estoque }; 
+        }
+        return { ...p, qtd_total: novaQuantidade };
+      }
+      return p;
+    })
+  );
+};
+const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
+const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
+const isAdicionarDesabilitado = (produto) => {
+  const itemNoCarrinho = cart.find((item) => item.id_produto === produto.id_produto);
+  const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
+  return quantidadeNoCarrinho >= produto.estoque;
+};
   const finalizarPedido = () => {
     fecharConfirmacao();
     let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal, "lista_produtos": cart}
-
     fetch("/api/new_order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -152,6 +150,7 @@ export default function Order() {
     produto.dc_produto.toLowerCase().includes(search.toLowerCase())
   );
   return (
+    
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
       <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
               <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
@@ -252,7 +251,7 @@ export default function Order() {
                             ))}
                           </TableBody>
                         </Table>
-                      </TableContainer>
+                    </TableContainer>
                       <Box align="center">
                         <Button variant="contained" color="primary" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#003399", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"250px", ":hover": { backgroundColor: "#001469" }}}>Finalizar Venda</Button>
                       </Box>
@@ -275,49 +274,79 @@ export default function Order() {
                   ) : (
                     <List>
                       {cart.map((item) => (
-                        <ListItem key={item.id} secondaryAction={
-                          <>
-                          <Box sx={{ display: "flex", alignItems: "center", marginLeft: "-90px",borderRadius: 1, backgroundColor:"#ccc"}}>
-                              <IconButton onClick={() => setCart(cart.filter((p) => p.id !== item.id))} sx={{backgroundColor:"#fff", color:"#003399", maxHeight:"30px", maxWidth:"30px", marginRight:"5px",":hover": { backgroundColor: "#eee" }}}>
-                                <DeleteRoundedIcon />
-                              </IconButton>
-                              <IconButton onClick={() => alterarQuantidade(item.id, -1)} sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
-                                <Remove />
-                              </IconButton>
-                              <Typography sx={{marginLeft:"5px", marginRight:"5px"}}>{item.qtd_total}</Typography>
-                              <IconButton
-                                  onClick={() => alterarQuantidade(item.id, 1)}
-                                  disabled={item.qtd_total >= item.qtd_estoque}
-                                  sx={{
-                                    backgroundColor: "primary.main",
-                                    color: "#fff",
-                                    maxHeight: "30px",
-                                    maxWidth: "30px",
-                                    ":hover": {
-                                      backgroundColor: "#003399"
-                                    },
-                                    ...(item.qtd_total >= item.qtd_estoque && {
-                                      backgroundColor: "grey.400",
-                                      color: "white",
-                                    }),
-                                  }}>
-                                <Add />
-                              </IconButton>
-                          </Box>
-                          </>
-                        }>
-                          <ListItemText primary={item.dc_produto} secondary={`R$ ${item.vl_produto} cada`}/>
-                        </ListItem>
+                      <ListItem
+                      key={item.id_produto}
+                      secondaryAction={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            borderRadius: 1,
+                            backgroundColor: "#ccc",
+                            px: 1,
+                          }}>
+                          <IconButton
+                            onClick={() =>
+                              setCart((prev) => prev.filter((p) => p.id_produto !== item.id_produto))
+                            }
+                            sx={{
+                              backgroundColor: "#fff",
+                              color: "#003399",
+                              height: 30,
+                              width: 30,
+                              ":hover": { backgroundColor: "#eee" },
+                            }}>
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => alterarQuantidade(item.id_produto, -1)}
+                            sx={{
+                              backgroundColor: "primary.main",
+                              color: "#fff",
+                              height: 30,
+                              width: 30,
+                              ":hover": { backgroundColor: "#003399" },
+                            }}>
+                            <Remove />
+                          </IconButton>
+                          <Typography sx={{ mx: 1 }}>{item.qtd_total}</Typography>
+                          <IconButton
+                            onClick={() => alterarQuantidade(item.id_produto, 1)}
+                            disabled={item.qtd_total >= item.qtd_produto}
+                            sx={{
+                              backgroundColor: item.qtd_total >= item.estoque
+                                ? "grey.400"
+                                : "primary.main",
+                              color: "#fff",
+                              height: 30,
+                              width: 30,
+                              ":hover": {
+                                backgroundColor:
+                                  item.qtd_total >= item.estoque ? "grey.500" : "#003399",
+                              },
+                            }}
+                          >
+                            <Add />
+                          </IconButton>
+                        </Box>
+                      }
+                      >
+                      <ListItemText
+                        primary={item.dc_produto}
+                        secondary={`R$ ${item.vl_produto} cada`}
+                      />
+                      </ListItem>
                       ))}
-                    </List>
+                      </List>
                   )}
                   <Typography variant="h6" style={{ marginTop: 10, textAlign:"center"}}>Deseja Finalizar essa Venda?</Typography>
                   <Box sx={{ display: "flex",justifyContent: "center", alignItems: "center" }}>
                     <Typography variant="h6" style={{ marginTop: 10, fontWeight:"bold" }}> Total:</Typography>
                     <Typography variant="h6" style={{ marginTop: 10, marginLeft:"5px"}}>R$ {valorTotal.toFixed(2)}</Typography>
                   </Box>
-              </DialogContent>
-              <DialogActions>
+                </DialogContent>
+                <DialogActions>
                 <Button onClick={fecharResumo} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
                 <Button variant="contained" color="primary" onClick={abrirConfirmacao} disabled={cart.length === 0}>Confirmar</Button>
               </DialogActions>
@@ -350,7 +379,7 @@ export default function Order() {
                   </DialogActions>
                 </Box>
             </Dialog>
-          </Box>
+      </Box>
     </Box>
   );
 }
