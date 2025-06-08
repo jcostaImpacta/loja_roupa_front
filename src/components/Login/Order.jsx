@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {Add, AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Remove, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
+import { AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
+import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -100,8 +101,8 @@ export default function Order() {
         if (novaQuantidade < 1) {
           return { ...p, qtd_total: 1 };
         }
-        if (novaQuantidade > p.estoque) {
-          return { ...p, qtd_total: p.estoque }; 
+        if (novaQuantidade > p.qtd_produto) {
+          return { ...p, qtd_total: p.qtd_produto }; 
         }
         return { ...p, qtd_total: novaQuantidade };
       }
@@ -114,7 +115,7 @@ const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
 const isAdicionarDesabilitado = (produto) => {
   const itemNoCarrinho = cart.find((item) => item.id_produto === produto.id_produto);
   const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
-  return quantidadeNoCarrinho >= produto.estoque;
+  return quantidadeNoCarrinho >= produto.qtd_produto;
 };
   const finalizarPedido = () => {
     fecharConfirmacao();
@@ -220,7 +221,7 @@ const isAdicionarDesabilitado = (produto) => {
                           </TableHead>
                           <TableBody>
                             {produtosFiltrados.slice((page - 1) * itemsPerPage, page * itemsPerPage).map((produto) =>  (
-                              <TableRow key={produto.id}>
+                              <TableRow key={produto.id_produto}>
                                 <TableCell>{produto.dc_produto}</TableCell>
                                 <TableCell align="center">R$ {produto.vl_produto.toFixed(2)}</TableCell>
                                 <TableCell align="center">
@@ -241,7 +242,8 @@ const isAdicionarDesabilitado = (produto) => {
                                         cursor: "not-allowed",
                                         ":hover": {
                                           backgroundColor: "#ccc"
-                                        }
+                                        },
+                                        disabled:"true"
                                       })
                                     }}>
                                       Adicionar
@@ -315,7 +317,7 @@ const isAdicionarDesabilitado = (produto) => {
                             onClick={() => alterarQuantidade(item.id_produto, 1)}
                             disabled={item.qtd_total >= item.qtd_produto}
                             sx={{
-                              backgroundColor: item.qtd_total >= item.estoque
+                              backgroundColor: item.qtd_total >= item.qtd_produto
                                 ? "grey.400"
                                 : "primary.main",
                               color: "#fff",
@@ -323,7 +325,7 @@ const isAdicionarDesabilitado = (produto) => {
                               width: 30,
                               ":hover": {
                                 backgroundColor:
-                                  item.qtd_total >= item.estoque ? "grey.500" : "#003399",
+                                  item.qtd_total >= item.qtd_produto ? "grey.500" : "#003399",
                               },
                             }}
                           >
