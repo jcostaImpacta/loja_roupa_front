@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
+import { AppBar, Badge,Box, Button, Dialog,DialogTitle, DialogContent, DialogContentText,DialogActions, Drawer, MenuItem,Toolbar,Typography, IconButton, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableContainer, TableRow, TextField} from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -12,7 +12,6 @@ import Pagination from '@mui/material/Pagination';
 import Menu from '@mui/material/Menu';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
 import './Order.css';
-
 
 export default function Order() {
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ export default function Order() {
   const [produtos, setProdutos] = useState([]);
   const [pedidoSucesso, setPedidoSucesso] = useState(false);
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({});
+  const [filters] = useState({});
   const [page, setPage] = useState(1);
   const itemsPerPage = 10
 
@@ -52,65 +51,75 @@ export default function Order() {
       .catch((error) => console.error("Erro nas requisições:", error))
       .finally(() => setLoading(false));
   };
-  
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
-
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleLogout = () => {
     setAnchorEl(null);
     navigate("/");
   };
-
   const abrirResumo = () => setResumoAberto(true);
   const fecharResumo = () => setResumoAberto(false);
-
   const abrirConfirmacao = () => {
     setResumoAberto(false);
     setConfirmacaoAberta(true);
   };
   const fecharConfirmacao = () => setConfirmacaoAberta(false);
   const adicionarProduto = (produto) => {
-    const existente = cart.includes((p) => p.id === produto.id);
-    if (existente) {
-      setCart((prev) =>
-        prev.map((p) =>
-          p.id === produto.id ? { ...p, qtd_total: p.qtd_total + 1 } : p
-        )
-      );
-    } else {
-      setCart([...cart, { ...produto, qtd_total: 1 }]);
-    }
+    setCart((prevCart) => {
+      const produtoExistente = prevCart.find((p) => p.id_produto === produto.id_produto);
+      const quantidadeNoCarrinho = produtoExistente ? produtoExistente.qtd_total : 0;
+
+      if (quantidadeNoCarrinho >= produto.qtd_total) {
+        return prevCart;
+      }
+      if (produtoExistente) {
+        return prevCart.map((p) =>
+          p.id_produto === produto.id_produto
+            ? { ...p, qtd_total: p.qtd_total + 1 }
+            : p
+        );
+      } else {
+        return [...prevCart, { ...produto, qtd_total: 1 }];
+      }
+    });
   };
   const fetchOrder = async () => {
     navigate("/new_order");
   };
   const alterarQuantidade = (id, delta) => {
-    setCart((prev) =>
-      prev
-        .map((p) =>
-          p.id === id ? { ...p, qtd_total: Math.max(1, p.qtd_total + delta) } : p
-        )
-    );
-  };
-
-  const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
-
-  const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
-
+  setCart((prev) =>
+    prev.map((p) => {
+      if (p.id_produto === id) {
+        const novaQuantidade = p.qtd_total + delta;
+        if (novaQuantidade < 1) {
+          return { ...p, qtd_total: 1 };
+        }
+        if (novaQuantidade > p.qtd_produto) {
+          return { ...p, qtd_total: p.qtd_produto }; 
+        }
+        return { ...p, qtd_total: novaQuantidade };
+      }
+      return p;
+    })
+  );
+};
+const valorTotal = cart.reduce((total, item) => total + item.qtd_total * item.vl_produto, 0);
+const quantidadeTotal = cart.reduce((sum, item) => sum + item.qtd_total, 0)
+const isAdicionarDesabilitado = (produto) => {
+  const itemNoCarrinho = cart.find((item) => item.id_produto === produto.id_produto);
+  const quantidadeNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd_total : 0;
+  return quantidadeNoCarrinho >= produto.qtd_produto;
+};
   const finalizarPedido = () => {
     fecharConfirmacao();
-
-    let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal}
-
+    let orderData = {"cd_usuario": user.codigo, "vl_total_ordem": valorTotal ,"qtd_total_produto": quantidadeTotal, "lista_produtos": cart}
     fetch("/api/new_order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -129,14 +138,20 @@ export default function Order() {
         .catch((error) => console.error("Erro nas requisições:", error))
         .finally(() => setLoading(false));
   };
-
-  const dataFormatada = new Date(orderResult.dt_ordem).toLocaleString("pt-BR").slice(0, 17);
-
+  const fetchReturn = () => {
+    fetchData();
+    setModoVendaAtivo(false);
+    setResumoAberto(false);
+    setPedidoSucesso(false);
+    setCart([]);
+    navigate("/products");
+  }
+  const dataFormatada = orderResult?.dt_ordem ? new Date(orderResult.dt_ordem).toLocaleString("pt-BR").slice(0, 17) : "";
   const produtosFiltrados = produtos.filter(produto =>
     produto.dc_produto.toLowerCase().includes(search.toLowerCase())
   );
-  
   return (
+    
     <Box sx={{ display: "flex", backgroundColor: "#ccc", height: "100vh", width: "100vw"}}>
       <Drawer variant="permanent" sx={{ width: "10vw", flexShrink: 0, minHeight:"80vh", "& .MuiDrawer-paper": { width: "15vw", minHeight:"20vh", backgroundImage: "linear-gradient(45deg, #0C2051,#2EAAE9)", }, }}>
               <Toolbar sx={{display: "flex", alignItems: "center", justifyContent: "center", textAlign:"center"}}>
@@ -149,26 +164,19 @@ export default function Order() {
                   <DashboardIcon/>Produtos
                 </Button>
               </AppBar>
-
-
               <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
                 <Button onClick={fetchOrder} edge="start" color="inherit" sx={{color:"white", backgroundColor: "none", boxShadow: "none", "&:hover": { backgroundColor: "none" }}}>
                   <Box component="img" src="caixa.png" alt="caixa aberta" sx={{height: "24px", textAlign:"center", marginRight:"3px"}}/>Nova Venda
                 </Button>
               </AppBar>
-
-
               <AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
                 <Button edge="start" color="inherit" onClick={() => navigate("/")} sx={{ backgroundColor: "none", boxShadow:"none","&:hover": { backgroundColor: "none" } }}>
                   <ExitToAppIcon/> Sair
                 </Button>
               </AppBar>
       </Drawer>
-
       <Box sx={{ display:"flex",width:"90vw",flexGrow: 1, p: 3, backgroundColor: "#ccc", minHeight:"100vh", color:"#001469"}}>
-      
         <Box sx={{ margin: "0 auto", padding: 2, width: "100%", maxWidth: "60vw" }}>
-        
           <Box sx={{ display: "flex", justifyContent: "end", mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "self-start", marginRight:"38vw", position:"absolute", width:"20vw"}}>
             <TextField variant="outlined" placeholder="Buscar..." sx={{width: "25vw",backgroundColor: "#eee",borderRadius: "8px",boxShadow: 3,"&:hover": { backgroundColor: "none", border: "#001469" }}} value={search} onChange={handleSearchChange} 
@@ -184,7 +192,6 @@ export default function Order() {
               <Box component="img" src="caixa-azul.png" alt="Resumo do pedido" sx={{ maxHeight:"30px", maxWidth:"30px" }} />
             </Badge>
           </IconButton>
-
           <Button edge="end" color="inherit" onClick={handleMenuOpen} sx={{padding: 0,minWidth: 0, width: 'auto', height: 'auto', backgroundColor: "transparent", boxShadow: "none","&:hover": { backgroundColor: "transparent", boxShadow: "none" },}}>
             <AccountCircle sx={{height: '4vh', width: '4vw', color: "#001469",backgroundColor: "transparent", "&:hover": { backgroundColor: "transparent" }}}/>
             <Typography sx={{ color: "#001469", fontWeight: "bold" }}>{user.descricao}</Typography>
@@ -193,7 +200,6 @@ export default function Order() {
             <MenuItem onClick={handleLogout} sx={{backgroundColor: "none",boxShadow: "none", color: "#001469", "&:hover": { backgroundColor: "none", boxShadow: "none" }}}> Sair</MenuItem>
           </Menu>
           </Box>
-              
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "initial", marginTop: 2, backgroundColor: "#fff", padding: 2, borderRadius: 2, boxShadow: 3 }}>
               <Box sx={{ display: "flex", alignItems: "center", flexDirection:"row",  marginTop: 2 }}>
                 <ShoppingBagRoundedIcon sx={{display:"flex",height: "30px", width:"30px", marginRight:"8px"}}/>
@@ -215,17 +221,39 @@ export default function Order() {
                           </TableHead>
                           <TableBody>
                             {produtosFiltrados.slice((page - 1) * itemsPerPage, page * itemsPerPage).map((produto) =>  (
-                              <TableRow key={produto.id}>
+                              <TableRow key={produto.id_produto}>
                                 <TableCell>{produto.dc_produto}</TableCell>
                                 <TableCell align="center">R$ {produto.vl_produto.toFixed(2)}</TableCell>
                                 <TableCell align="center">
-                                  <Button onClick={() => adicionarProduto(produto)} sx={{backgroundColor:"#001469", color:"#ccc", fontWeight:"bold", textTransform:"capitalize", maxWidth:"150px", ":hover": { backgroundColor: "#003399" }}}>Adicionar</Button>
+                                    <Button
+                                    onClick={() => adicionarProduto(produto)}
+                                     sx={{
+                                      backgroundColor: "#001469",
+                                      color: "#ccc",
+                                      fontWeight: "bold",
+                                      textTransform: "capitalize",
+                                      maxWidth: "150px",
+                                      ":hover": {
+                                        backgroundColor: "#003399"
+                                      },
+                                      ...(isAdicionarDesabilitado(produto) && {
+                                        backgroundColor: "#ccc",
+                                        color: "#666",
+                                        cursor: "not-allowed",
+                                        ":hover": {
+                                          backgroundColor: "#ccc"
+                                        },
+                                        disabled:"true"
+                                      })
+                                    }}>
+                                      Adicionar
+                                    </Button>
                                 </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
                         </Table>
-                      </TableContainer>
+                    </TableContainer>
                       <Box align="center">
                         <Button variant="contained" color="primary" onClick={abrirResumo} sx={{marginTop:"20px", backgroundColor:"#003399", color:"#ccc", textTransform:"capitalize", fontWeight:"bold", maxWidth:"250px", ":hover": { backgroundColor: "#001469" }}}>Finalizar Venda</Button>
                       </Box>
@@ -233,7 +261,7 @@ export default function Order() {
                 )}
           </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <Pagination count={Math.ceil(produtos?.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
+            <Pagination count={Math.ceil(produtos.length / itemsPerPage)} page={page} onChange={(e, value) => setPage(value)} sx={{ "& .MuiPaginationItem-root": { color: "#001469" }, "& .MuiPaginationItem-previousNext": { backgroundColor: "#001469", color: "#ddd", "&:hover": { backgroundColor: "#003399" } }}} />
           </Box>
         </Box>
         <Dialog open={resumoAberto} onClose={fecharResumo} maxWidth="sm" fullWidth>
@@ -248,34 +276,79 @@ export default function Order() {
                   ) : (
                     <List>
                       {cart.map((item) => (
-                        <ListItem key={item.id} secondaryAction={
-                          <>
-                          <Box sx={{ display: "flex", alignItems: "center", marginLeft: "-90px",borderRadius: 1, backgroundColor:"#ccc"}}>
-                              <IconButton onClick={() => setCart(cart.filter((p) => p.id !== item.id))} sx={{backgroundColor:"#fff", color:"#003399", maxHeight:"30px", maxWidth:"30px", marginRight:"5px",":hover": { backgroundColor: "#eee" }}}>
-                                <DeleteRoundedIcon />
-                              </IconButton>
-                              <IconButton onClick={() => alterarQuantidade(item.id, -1)} sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
-                                <Remove />
-                              </IconButton>
-                              <Typography sx={{marginLeft:"5px", marginRight:"5px"}}>{item.qtd_total}</Typography>
-                              <IconButton onClick={() => alterarQuantidade(item.id, 1)}sx={{backgroundColor:"primary.main", color:"#fff", maxHeight:"30px", maxWidth:"30px",":hover": { backgroundColor: "#003399" }}}>
-                                <Add />
-                              </IconButton>
-                          </Box>
-                          </>
-                        }>
-                          <ListItemText primary={item.dc_produto} secondary={`R$ ${item.vl_produto} cada`}/>
-                        </ListItem>
+                      <ListItem
+                      key={item.id_produto}
+                      secondaryAction={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            borderRadius: 1,
+                            backgroundColor: "#ccc",
+                            px: 1,
+                          }}>
+                          <IconButton
+                            onClick={() =>
+                              setCart((prev) => prev.filter((p) => p.id_produto !== item.id_produto))
+                            }
+                            sx={{
+                              backgroundColor: "#fff",
+                              color: "#003399",
+                              height: 30,
+                              width: 30,
+                              ":hover": { backgroundColor: "#eee" },
+                            }}>
+                            <DeleteRoundedIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => alterarQuantidade(item.id_produto, -1)}
+                            sx={{
+                              backgroundColor: "primary.main",
+                              color: "#fff",
+                              height: 30,
+                              width: 30,
+                              ":hover": { backgroundColor: "#003399" },
+                            }}>
+                            <Remove />
+                          </IconButton>
+                          <Typography sx={{ mx: 1 }}>{item.qtd_total}</Typography>
+                          <IconButton
+                            onClick={() => alterarQuantidade(item.id_produto, 1)}
+                            disabled={item.qtd_total >= item.qtd_produto}
+                            sx={{
+                              backgroundColor: item.qtd_total >= item.qtd_produto
+                                ? "grey.400"
+                                : "primary.main",
+                              color: "#fff",
+                              height: 30,
+                              width: 30,
+                              ":hover": {
+                                backgroundColor:
+                                  item.qtd_total >= item.qtd_produto ? "grey.500" : "#003399",
+                              },
+                            }}
+                          >
+                            <Add />
+                          </IconButton>
+                        </Box>
+                      }
+                      >
+                      <ListItemText
+                        primary={item.dc_produto}
+                        secondary={`R$ ${item.vl_produto} cada`}
+                      />
+                      </ListItem>
                       ))}
-                    </List>
+                      </List>
                   )}
                   <Typography variant="h6" style={{ marginTop: 10, textAlign:"center"}}>Deseja Finalizar essa Venda?</Typography>
                   <Box sx={{ display: "flex",justifyContent: "center", alignItems: "center" }}>
                     <Typography variant="h6" style={{ marginTop: 10, fontWeight:"bold" }}> Total:</Typography>
                     <Typography variant="h6" style={{ marginTop: 10, marginLeft:"5px"}}>R$ {valorTotal.toFixed(2)}</Typography>
                   </Box>
-              </DialogContent>
-              <DialogActions>
+                </DialogContent>
+                <DialogActions>
                 <Button onClick={fecharResumo} sx={{backgroundColor:"#fff", ":hover": { backgroundColor: "#eee" }}}>Cancelar</Button>
                 <Button variant="contained" color="primary" onClick={abrirConfirmacao} disabled={cart.length === 0}>Confirmar</Button>
               </DialogActions>
@@ -293,7 +366,6 @@ export default function Order() {
                 </DialogActions>
               </Box>
             </Dialog>
-
             <Dialog open={pedidoSucesso} onClose={() => setPedidoSucesso(false)}>
                 <Box sx={{backgroundColor: "#ccc", padding: 2, borderRadius: 1, boxShadow: 3, color:"#001469", textAlign:"center"}}>
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection:"column", marginTop: 2 }}>
@@ -305,11 +377,11 @@ export default function Order() {
                     <DialogContentText>Venda Realizada: {dataFormatada}</DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button variant="contained" autoFocus color="primary" onClick={() => setPedidoSucesso(false)}>Ok</Button>
+                    <Button variant="contained" autoFocus color="primary" onClick={() => fetchReturn()}>Ok</Button>
                   </DialogActions>
                 </Box>
             </Dialog>
-          </Box>
+      </Box>
     </Box>
   );
 }
